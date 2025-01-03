@@ -1,28 +1,15 @@
-import React, { useState } from "react";
+// ImageSlider.js
+
+import React, { useState, useEffect } from "react";
+import useGetYoutubeVideos from "../hooks/useGetYoutubeVideos";
+import { GrFormEdit } from "react-icons/gr";
+import ChangeSlider from "../../pages/ChangeSlider/ChangeSlider";
 
 const ImageSlider = () => {
-  const videos = [
-    {
-      videoId: "vtazUb2RdmE",
-      title: "Yayın ve videolarda GAMEPAD nasıl gösterilir?",
-      thumbnail:
-        "https://i9.ytimg.com/vi_webp/vtazUb2RdmE/maxresdefault.webp?v=66ef6053&sqp=CMDK2rsG&rs=AOn4CLCyVuaR0VQ4QddsohYhfxBCyA7T9Q",
-    },
-    {
-      videoId: "c_6dkbQjI68",
-      title: "Logitech G305 Lightspeed İncelemesi! ( 2024 )",
-      thumbnail:
-        "https://i9.ytimg.com/vi_webp/c_6dkbQjI68/maxresdefault.webp?v=66bbc037&sqp=CMDK2rsG&rs=AOn4CLDLE3NK-o9PyZph_z0ZW8I45yrg6g",
-    },
-    {
-      videoId: "sE4zxw6_ejI",
-      title: "Edit yapıyorsan bu videoyu kesinlikle İZLEMELİSİN!",
-      thumbnail:
-        "https://i9.ytimg.com/vi_webp/sE4zxw6_ejI/mqdefault_custom_1.webp?v=66ad6dcb&sqp=CMDK2rsG&rs=AOn4CLBcRkj-YDwlhTRdwcDVBoid_qe6Lw",
-    },
-  ];
-
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const { videos, loading, error } = useGetYoutubeVideos();
 
   const goToPrevious = () => {
     setCurrentIndex((prevIndex) =>
@@ -36,60 +23,70 @@ const ImageSlider = () => {
     );
   };
 
+  const handleEdit = (video) => {
+    setSelectedVideo(video);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedVideo(null);
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      goToNext();
+    }, 5000);
+
+    return () => clearInterval(interval); // Component unmount olduğunda interval temizlenir
+  }, [currentIndex]);
+
+  if (loading) return <p>Loading videos...</p>;
+  if (error) return <p>{error}</p>;
+
   return (
-    <div className="relative w-full p-5" data-carousel="slide">
-      <div className="relative h-56 overflow-hidden rounded-lg md:h-96">
-        {/* Slider'daki video */}
+    <div className="relative w-full p-5">
+      {isModalOpen && (
+        <ChangeSlider video={selectedVideo} onClose={handleCloseModal} />
+      )}
+
+      <div className="relative h-56 w-2/4 mx-auto overflow-hidden rounded-lg md:h-96">
         {videos.map((video, index) => (
           <div
             key={video.videoId}
-            className={`duration-700 ease-in-out ${
-              index === currentIndex ? "block" : "hidden"
+            className={`absolute top-0 left-0 w-full h-full transition-all duration-1000 ease-in-out ${
+              index === currentIndex
+                ? "opacity-100 transform translate-x-0"
+                : "opacity-0 transform translate-x-full"
             }`}
-            data-carousel-item
           >
-            <a
-              href={`https://www.youtube.com/watch?v=${video.videoId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a href={video.url} target="_blank" rel="noopener noreferrer">
               <img
                 src={video.thumbnail}
                 alt={video.title}
-                className="absolute block w-full h-full object-cover -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 transition-all duration-500"
+                className="absolute block w-full h-full object-cover"
               />
-              <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white p-2 w-full text-center">
+              <div className="absolute bottom-0 left-1/2 transform bg-gray-800 -translate-x-1/2 bg-opacity-50 text-white w-full text-center p-0.5">
                 <h3 className="text-lg">{video.title}</h3>
               </div>
             </a>
+            <GrFormEdit
+              size={35}
+              className="absolute right-0 text-gray-500 cursor-pointer bg-gray-800 rounded-bl-lg"
+              onClick={() => handleEdit(video)} // Edit ikonuna tıklanınca modal açılır
+            />
           </div>
         ))}
       </div>
 
-      {/* Carousel Slide butonları */}
-      <div className="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3 rtl:space-x-reverse">
-        {videos.map((_, index) => (
-          <button
-            key={index}
-            type="button"
-            className="w-3 h-3 rounded-full"
-            aria-current={index === currentIndex ? "true" : "false"}
-            aria-label={`Slide ${index + 1}`}
-            onClick={() => setCurrentIndex(index)}
-          ></button>
-        ))}
-      </div>
-
-      {/* Previous Button */}
       <button
         type="button"
         className="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
         onClick={goToPrevious}
       >
-        <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+        <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 group-hover:bg-white/50">
           <svg
-            className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
-            aria-hidden="true"
+            className="w-4 h-4 text-white"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 6 10"
@@ -102,20 +99,17 @@ const ImageSlider = () => {
               d="M5 1 1 5l4 4"
             />
           </svg>
-          <span className="sr-only">Previous</span>
         </span>
       </button>
 
-      {/* Next Button */}
       <button
         type="button"
         className="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
         onClick={goToNext}
       >
-        <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+        <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 group-hover:bg-white/50">
           <svg
-            className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
-            aria-hidden="true"
+            className="w-4 h-4 text-white"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 6 10"
@@ -128,7 +122,6 @@ const ImageSlider = () => {
               d="m1 9 4-4-4-4"
             />
           </svg>
-          <span className="sr-only">Next</span>
         </span>
       </button>
     </div>
