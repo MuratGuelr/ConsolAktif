@@ -1,5 +1,6 @@
 import React from "react";
-import { IoMenu } from "react-icons/io5";
+import { IoMenu, IoApps } from "react-icons/io5";
+import Avatar from "../../components/Avatar/Avatar";
 
 const Navbar = () => {
   return (
@@ -18,10 +19,13 @@ const Navbar = () => {
         <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
           <button
             type="button"
-            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            className="text-white focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-3 py-2 text-center hover:text-gray-500 transition-all"
           >
-            Uygulamalarım
+            <IoApps size={25} />
           </button>
+          <div>
+            <Avatar />
+          </div>
 
           <button
             data-collapse-toggle="navbar-cta"
