@@ -1,14 +1,15 @@
-// ImageSlider.js
-
 import React, { useState, useEffect } from "react";
-import useGetYoutubeVideos from "../hooks/useGetYoutubeVideos";
 import { GrFormEdit } from "react-icons/gr";
 import ChangeSlider from "../../pages/ChangeSlider/ChangeSlider";
+import useGetYoutubeVideos from "../../hooks/useGetYoutubeVideos";
+import ImageSpinner from "../Spinner/ImageSpinner";
 
 const ImageSlider = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
+
+  // Get videos from Firestore using the custom hook
   const { videos, loading, error } = useGetYoutubeVideos();
 
   const goToPrevious = () => {
@@ -38,10 +39,15 @@ const ImageSlider = () => {
       goToNext();
     }, 5000);
 
-    return () => clearInterval(interval); // Component unmount olduğunda interval temizlenir
+    return () => clearInterval(interval);
   }, [currentIndex]);
 
-  if (loading) return <p>Loading videos...</p>;
+  if (loading)
+    return (
+      <div className="bg-gray-900 flex mx-auto">
+        <ImageSpinner />
+      </div>
+    );
   if (error) return <p>{error}</p>;
 
   return (
@@ -50,7 +56,7 @@ const ImageSlider = () => {
         <ChangeSlider video={selectedVideo} onClose={handleCloseModal} />
       )}
 
-      <div className="relative h-56 w-2/4 mx-auto overflow-hidden rounded-lg md:h-96">
+      <div className="relative h-56 w-1/2 mx-auto overflow-hidden rounded-lg md:h-96">
         {videos.map((video, index) => (
           <div
             key={video.videoId}
@@ -66,14 +72,14 @@ const ImageSlider = () => {
                 alt={video.title}
                 className="absolute block w-full h-full object-cover"
               />
-              <div className="absolute bottom-0 left-1/2 transform bg-gray-800 -translate-x-1/2 bg-opacity-50 text-white w-full text-center p-0.5">
+              <div className="absolute bottom-0 left-1/2 transform bg-gray-800 -translate-x-1/2 bg-opacity-50 text-white w-full text-center p-1">
                 <h3 className="text-lg">{video.title}</h3>
               </div>
             </a>
             <GrFormEdit
               size={35}
               className="absolute right-0 text-gray-500 cursor-pointer bg-gray-800 rounded-bl-lg"
-              onClick={() => handleEdit(video)} // Edit ikonuna tıklanınca modal açılır
+              onClick={() => handleEdit(video)}
             />
           </div>
         ))}
