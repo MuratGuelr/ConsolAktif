@@ -1,19 +1,49 @@
+import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home/Home";
 import About from "./pages/About/About";
 import Contact from "./pages/Contact/Contact";
+import Login from "./pages/Login/Login";
+import Signup from "./pages/Signup/Signup";
+import NotFound from "./pages/NotFound/NotFound";
+import useGetUser from "./hooks/useGetUser";
+import Spinner from "./components/Spinner/Spinner";
+import Settings from "./pages/Settings/Settings";
 
 function App() {
+  const { user, loading } = useGetUser();
+
+  console.log(user);
+
+  if (loading) {
+    return (
+      <div className="bg-gray-900">
+        <Spinner />
+      </div>
+    );
+  }
+
   return (
-    <>
+    <div className="bg-gray-900">
       <Router>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
+          {user ? (
+            <>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/settings" element={<Settings />} />
+            </>
+          ) : (
+            <>
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+            </>
+          )}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
-    </>
+    </div>
   );
 }
 
