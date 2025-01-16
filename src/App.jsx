@@ -9,6 +9,10 @@ import NotFound from "./pages/NotFound/NotFound";
 import useGetUser from "./hooks/useGetUser";
 import Spinner from "./components/Spinner/Spinner";
 import Settings from "./pages/Settings/Settings";
+import AllApps from "./pages/Apps/AllApps";
+import CreateApps from "./components/CreateApps/CreateApps";
+import AllVideos from "./pages/AllVideos/AllVideos";
+import AutoEditor from "./apps/AutoEditor";
 
 function App() {
   const { user, loading } = useGetUser();
@@ -33,6 +37,10 @@ function App() {
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/apps" element={<AllApps />} />
+              <Route path="/create-post" element={<CreateApps />} />
+              <Route path="/all-videos" element={<AllVideos />} />
+              <Route path="/auto-editor" element={<AutoEditor />} />
             </>
           ) : (
             <>

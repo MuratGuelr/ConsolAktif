@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { GrFormEdit } from "react-icons/gr";
-import ChangeSlider from "../../pages/ChangeSlider/ChangeSlider";
 import useGetYoutubeVideos from "../../hooks/useGetYoutubeVideos";
 import ImageSpinner from "../Spinner/ImageSpinner";
+import { FaPlay } from "react-icons/fa";
+import { useSpring, animated, config } from "@react-spring/web";
 
-const ImageSlider = () => {
+const ImageSlider = ({ videos, loading, error, onLoad }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
-
-  // Get videos from Firestore using the custom hook
-  const { videos, loading, error } = useGetYoutubeVideos();
 
   const goToPrevious = () => {
     setCurrentIndex((prevIndex) =>
@@ -24,14 +20,13 @@ const ImageSlider = () => {
     );
   };
 
-  const handleEdit = (video) => {
-    setSelectedVideo(video);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedVideo(null);
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("tr-TR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
   };
 
   useEffect(() => {
@@ -42,6 +37,39 @@ const ImageSlider = () => {
     return () => clearInterval(interval);
   }, [currentIndex]);
 
+  useEffect(() => {
+    if (!loading && videos?.length > 0) {
+      onLoad?.(); // Slider yüklendiğinde callback'i çağır
+    }
+  }, [loading, videos, onLoad]);
+
+  // Slider container animasyonu
+  const containerSpring = useSpring({
+    from: { opacity: 0, transform: "scale(0.95)" },
+    to: { opacity: 1, transform: "scale(1)" },
+    config: config.gentle,
+  });
+
+  // Navigation butonları için hover animasyonu
+  const [prevButtonProps, prevButtonApi] = useSpring(() => ({
+    scale: 1,
+    config: { tension: 300, friction: 10 },
+  }));
+
+  const [nextButtonProps, nextButtonApi] = useSpring(() => ({
+    scale: 1,
+    config: { tension: 300, friction: 10 },
+  }));
+
+  // Video kartı için daha hızlı hover animasyonu
+  const [cardProps, cardApi] = useSpring(() => ({
+    scale: 1,
+    config: {
+      tension: 400, // Daha yüksek tension değeri
+      friction: 15, // Daha düşük friction değeri
+    },
+  }));
+
   if (loading)
     return (
       <div className="bg-gray-900 flex mx-auto">
@@ -51,44 +79,54 @@ const ImageSlider = () => {
   if (error) return <p>{error}</p>;
 
   return (
-    <div className="relative w-full p-5">
-      {isModalOpen && (
-        <ChangeSlider video={selectedVideo} onClose={handleCloseModal} />
-      )}
-
-      <div className="relative h-56 w-1/2 mx-auto overflow-hidden rounded-lg md:h-96">
+    <animated.div style={containerSpring} className="relative w-full p-5">
+      <div className="relative h-56 w-1/2 mx-auto rounded-lg md:h-96">
         {videos.map((video, index) => (
           <div
-            key={video.videoId}
-            className={`absolute top-0 left-0 w-full h-full transition-all duration-1000 ease-in-out ${
+            key={video.id}
+            className={`absolute top-0 left-0 w-full h-full transition-all duration-300 ease-in-out ${
               index === currentIndex
                 ? "opacity-100 transform translate-x-0"
                 : "opacity-0 transform translate-x-full"
             }`}
           >
-            <a href={video.url} target="_blank" rel="noopener noreferrer">
+            <animated.a
+              style={index === currentIndex ? cardProps : {}}
+              onMouseEnter={() =>
+                index === currentIndex && cardApi.start({ scale: 1.03 })
+              }
+              onMouseLeave={() =>
+                index === currentIndex && cardApi.start({ scale: 1 })
+              }
+              href={`https://www.youtube.com/watch?v=${video?.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block relative h-full"
+            >
               <img
-                src={video.thumbnail}
-                alt={video.title}
-                className="absolute block w-full h-full object-cover"
+                src={video?.snippet?.thumbnails?.standard?.url}
+                alt={video?.snippet?.title}
+                className="block w-full h-full object-cover rounded-lg"
               />
-              <div className="absolute bottom-0 left-1/2 transform bg-gray-800 -translate-x-1/2 bg-opacity-50 text-white w-full text-center p-1">
-                <h3 className="text-lg">{video.title}</h3>
+              <div className="absolute bottom-0 left-1/2 transform bg-gray-800 -translate-x-1/2 bg-opacity-50 text-white w-full text-center p-1 mt-4 rounded-b-lg">
+                <h3 className="text-base font-semibold">
+                  {video?.snippet?.title}
+                </h3>
               </div>
-            </a>
-            <GrFormEdit
-              size={35}
-              className="absolute right-0 text-gray-500 cursor-pointer bg-gray-800 rounded-bl-lg"
-              onClick={() => handleEdit(video)}
-            />
+              <span className="absolute text-sm font-medium me-2 px-2.5 py-0.5 rounded -top-2 left-5 bg-gray-700 text-gray-200 z-20">
+                {formatDate(video?.snippet?.publishedAt)}
+              </span>
+            </animated.a>
           </div>
         ))}
       </div>
 
-      <button
-        type="button"
-        className="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+      <animated.button
+        style={prevButtonProps}
+        onMouseEnter={() => prevButtonApi.start({ scale: 1.1 })}
+        onMouseLeave={() => prevButtonApi.start({ scale: 1 })}
         onClick={goToPrevious}
+        className="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
       >
         <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 group-hover:bg-white/50">
           <svg
@@ -106,12 +144,14 @@ const ImageSlider = () => {
             />
           </svg>
         </span>
-      </button>
+      </animated.button>
 
-      <button
-        type="button"
-        className="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+      <animated.button
+        style={nextButtonProps}
+        onMouseEnter={() => nextButtonApi.start({ scale: 1.1 })}
+        onMouseLeave={() => nextButtonApi.start({ scale: 1 })}
         onClick={goToNext}
+        className="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
       >
         <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 group-hover:bg-white/50">
           <svg
@@ -129,8 +169,8 @@ const ImageSlider = () => {
             />
           </svg>
         </span>
-      </button>
-    </div>
+      </animated.button>
+    </animated.div>
   );
 };
 
