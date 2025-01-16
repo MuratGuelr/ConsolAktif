@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
 import Home from "./pages/Home/Home";
 import About from "./pages/About/About";
 import Contact from "./pages/Contact/Contact";
@@ -41,14 +46,16 @@ function App() {
               <Route path="/create-post" element={<CreateApps />} />
               <Route path="/all-videos" element={<AllVideos />} />
               <Route path="/auto-editor" element={<AutoEditor />} />
+              <Route path="/login" element={<Navigate to="/" replace />} />
+              <Route path="/signup" element={<Navigate to="/" replace />} />
             </>
           ) : (
             <>
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="*" element={<Navigate to="/login" replace />} />
             </>
           )}
-          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </div>

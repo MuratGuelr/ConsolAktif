@@ -6,6 +6,8 @@ import { MdEmail } from "react-icons/md";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import { FaRegUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import Header from "../../components/Header/Header";
+Header;
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -54,6 +56,7 @@ const Signup = () => {
 
   return (
     <div className="p-5">
+      <Header title={"Kayıt Ol"} />
       <form
         onSubmit={handleRegister}
         className="max-w-sm mx-auto p-5 bg-gray-800 rounded-lg mt-10 mb-10"

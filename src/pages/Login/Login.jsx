@@ -4,6 +4,8 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { toast } from "react-toastify";
 import { MdEmail } from "react-icons/md";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
+import Header from "../../components/Header/Header";
+Header;
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -29,6 +31,7 @@ const Login = () => {
 
   return (
     <div className="p-5">
+      <Header title={"Giriş Yap"} />
       <form
         onSubmit={handleLogin}
         className="max-w-sm mx-auto p-5 bg-gray-800 rounded-lg mt-10 mb-10"
