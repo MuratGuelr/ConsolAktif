@@ -79,8 +79,8 @@ const Avatar = () => {
           <animated.div
             style={dropdownSpring}
             className={`${
-              isOpen ? "fixed" : "hidden"
-            } bg-white divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600 top-14 right-2 sm:right-auto sm:left-2 z-50`}
+              isOpen ? "fixed z-[9999] !important" : "hidden"
+            } bg-white divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600 top-14 right-2 sm:right-auto sm:left-2`}
           >
             <animated.div
               style={{

@@ -18,6 +18,7 @@ import AllApps from "./pages/Apps/AllApps";
 import CreateApps from "./components/CreateApps/CreateApps";
 import AllVideos from "./pages/AllVideos/AllVideos";
 import AutoEditor from "./apps/AutoEditor";
+import YouTubeDownloader from "./apps/YouTubeDownloader";
 
 function App() {
   const { user, loading } = useGetUser();
@@ -46,8 +47,10 @@ function App() {
               <Route path="/create-post" element={<CreateApps />} />
               <Route path="/all-videos" element={<AllVideos />} />
               <Route path="/auto-editor" element={<AutoEditor />} />
-              <Route path="/login" element={<Navigate to="/" replace />} />
-              <Route path="/signup" element={<Navigate to="/" replace />} />
+              <Route
+                path="/youtube-downloader"
+                element={<YouTubeDownloader />}
+              />
             </>
           ) : (
             <>

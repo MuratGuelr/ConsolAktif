@@ -61,7 +61,7 @@ function Root() {
 
   return (
     <StrictMode>
-      <div className="bg-gray-900 dark:bg-gray-900 h-screen">
+      <div className="bg-gray-900 dark:bg-gray-900 h-screen w-screen">
         <ToastContainer />
         <div className="min-h-screen flex flex-col">
           <animated.div style={navbarAnimation}>

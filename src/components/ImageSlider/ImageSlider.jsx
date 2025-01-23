@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from "react";
-import useGetYoutubeVideos from "../../hooks/useGetYoutubeVideos";
 import ImageSpinner from "../Spinner/ImageSpinner";
-import { FaPlay } from "react-icons/fa";
 import { useSpring, animated, config } from "@react-spring/web";
 
 const ImageSlider = ({ videos, loading, error, onLoad }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedVideo, setSelectedVideo] = useState(null);
 
   const goToPrevious = () => {
     setCurrentIndex((prevIndex) =>
@@ -79,8 +76,11 @@ const ImageSlider = ({ videos, loading, error, onLoad }) => {
   if (error) return <p>{error}</p>;
 
   return (
-    <animated.div style={containerSpring} className="relative w-full p-5">
-      <div className="relative h-56 w-1/2 mx-auto rounded-lg md:h-96">
+    <animated.div
+      style={containerSpring}
+      className="relative w-full p-5 max-w-screen-xl mx-auto"
+    >
+      <div className="relative h-56 w-full max-w-lg mx-auto rounded-lg md:h-96 overflow-hidden">
         {videos.map((video, index) => (
           <div
             key={video.id}
@@ -113,7 +113,7 @@ const ImageSlider = ({ videos, loading, error, onLoad }) => {
                   {video?.snippet?.title}
                 </h3>
               </div>
-              <span className="absolute text-sm font-medium me-2 px-2.5 py-0.5 rounded -top-2 left-5 bg-gray-700 text-gray-200 z-20">
+              <span className="absolute text-sm font-medium me-2 px-2.5 py-1 rounded top-0 left-2 bg-gray-700 text-gray-200">
                 {formatDate(video?.snippet?.publishedAt)}
               </span>
             </animated.a>
@@ -126,7 +126,7 @@ const ImageSlider = ({ videos, loading, error, onLoad }) => {
         onMouseEnter={() => prevButtonApi.start({ scale: 1.1 })}
         onMouseLeave={() => prevButtonApi.start({ scale: 1 })}
         onClick={goToPrevious}
-        className="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+        className="absolute top-0 start-0 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
       >
         <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 group-hover:bg-white/50">
           <svg
@@ -151,7 +151,7 @@ const ImageSlider = ({ videos, loading, error, onLoad }) => {
         onMouseEnter={() => nextButtonApi.start({ scale: 1.1 })}
         onMouseLeave={() => nextButtonApi.start({ scale: 1 })}
         onClick={goToNext}
-        className="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+        className="absolute top-0 end-0 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
       >
         <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 group-hover:bg-white/50">
           <svg

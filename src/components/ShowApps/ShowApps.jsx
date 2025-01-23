@@ -10,6 +10,13 @@ const ShowApps = () => {
         "Bu program sayesinde auto-editor'ü kolaylıkla kullanabilirsiniz.",
       link: "/auto-editor",
     },
+    {
+      name: "YouTube Downloader",
+      img: "apps/youtube-downloader/youtube.png",
+      description:
+        "Bu program sayesinde auto-editor'ü kolaylıkla kullanabilirsiniz.",
+      link: "/youtube-downloader",
+    },
   ];
 
   return (
@@ -22,7 +29,7 @@ const ShowApps = () => {
             class="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row md:max-w-xl hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
           >
             <img
-              class="w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-s-lg object-cover"
+              class="w-full rounded-t-lg md:h-auto md:w-48 ml-2 md:rounded-none md:rounded-s-lg object-cover"
               src={app.img}
             />
             <div class="flex flex-col justify-between p-4 leading-normal">
