@@ -30,6 +30,7 @@
     "react-syntax-highlighter": "^15.6.1",
     "react-toastify": "^11.0.2",
     "uuid": "^11.0.4",
+    "yt-dlp-exec": "^1.0.2",
     "zustand": "^5.0.2"
   },
   "devDependencies": {
