@@ -12,7 +12,7 @@ const YouTubeDownloader = () => {
   const [thumbnail, setThumbnail] = useState(null);
   const [title, setTitle] = useState("");
 
-  const API_URL = "http://192.168.30.36:3001";
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const isValidYouTubeUrl = (url) => {
     const regex =
