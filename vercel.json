@@ -1,3 +1,14 @@
 {
-  "rewrites": [{ "source": "/:path*", "destination": "/index.html" }]
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/node"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/:path*",
+      "destination": "/index.html"
+    }
+  ]
 }

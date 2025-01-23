@@ -19,7 +19,6 @@ import CreateApps from "./components/CreateApps/CreateApps";
 import AllVideos from "./pages/AllVideos/AllVideos";
 import AutoEditor from "./apps/AutoEditor";
 import YouTubeDownloader from "./apps/YouTubeDownloader";
-import { Analytics } from "@vercel/analytics/react";
 
 function App() {
   const { user, loading } = useGetUser();
@@ -36,7 +35,6 @@ function App() {
 
   return (
     <div className="bg-gray-900">
-      <Analytics />
       <Router>
         <Routes>
           {user ? (
