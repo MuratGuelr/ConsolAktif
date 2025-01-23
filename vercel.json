@@ -1,0 +1,11 @@
+{
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/node"
+    }
+  ],
+  "hooks": {
+    "build": "apt-get update && apt-get install -y python3"
+  }
+}
