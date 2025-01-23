@@ -1,5 +1,4 @@
 // api/videoInfo.js (Vercel için serverless fonksiyon)
-import { exec } from "child_process";
 import ytDlp from "yt-dlp";
 
 export default async function handler(req, res) {
