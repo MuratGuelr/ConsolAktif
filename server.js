@@ -5,7 +5,7 @@ import ytDlp from "yt-dlp-exec"; // Default export ile import ediyoruz.
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors());
+app.use(cors({ origin: "*" }));
 
 // Video bilgilerini almak için endpoint
 app.get("/info", async (req, res) => {
