@@ -2,11 +2,11 @@
   functions = "server"
 
 [[headers]]
-  for = "/dist/*"
+  for = "/*.js"
   [headers.values]
     Content-Type = "application/javascript"
 
 [[headers]]
-  for = "/*.js"
+  for = "/dist/*.js"
   [headers.values]
     Content-Type = "application/javascript"

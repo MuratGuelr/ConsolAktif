@@ -1,20 +1,23 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// vite.config.js
 export default defineConfig({
   plugins: [react()],
   build: {
-    target: "esnext", // Modern tarayıcılar için optimize et
-    outDir: "dist", // Çıktı dizini
+    target: "esnext",
+    outDir: "dist",
     rollupOptions: {
       output: {
-        format: "es", // Modül formatı olarak ES kullan
+        format: "es",
       },
     },
   },
   server: {
     host: "0.0.0.0",
     port: 3000,
+    // Add MIME type configuration
+    mimeTypes: {
+      "application/javascript": ["js"],
+    },
   },
 });
