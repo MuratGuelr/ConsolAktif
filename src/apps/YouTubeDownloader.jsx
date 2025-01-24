@@ -12,7 +12,7 @@ const YouTubeDownloader = () => {
   const [thumbnail, setThumbnail] = useState(null);
   const [title, setTitle] = useState("");
 
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = "/.netlify/functions";
 
   const isValidYouTubeUrl = (url) => {
     const regex =
@@ -34,10 +34,9 @@ const YouTubeDownloader = () => {
     }
 
     try {
-      const response = await axios.get(`${API_URL}/info`, {
-        params: { url: videoUrl },
-      });
-
+      const response = await axios.get(
+        `${API_URL}/info?url=${encodeURIComponent(videoUrl)}`
+      );
       const videoData = response.data;
       setTitle(videoData.title);
       setThumbnail(videoData.thumbnail);
@@ -55,7 +54,6 @@ const YouTubeDownloader = () => {
           : 0,
       }));
 
-      // **Sadece MP4 ve WEBM formatlarını filtrele ve kalite sırasına göre sırala**
       const videoFormats = formats
         .filter((f) => f.type === "mp4" || f.type === "webm")
         .sort((a, b) => b.qualityValue - a.qualityValue);
@@ -63,7 +61,6 @@ const YouTubeDownloader = () => {
       setQualities(videoFormats);
       setSelectedQuality(videoFormats[0]?.url || null);
 
-      // **En kaliteli M4A formatını bul**
       const bestM4A = formats
         .filter((f) => f.type === "m4a")
         .sort((a, b) => b.qualityValue - a.qualityValue)[0]?.url;
@@ -92,7 +89,10 @@ const YouTubeDownloader = () => {
       setError("Lütfen bir kalite seçin.");
       return;
     }
-    window.open(url, "_blank");
+    window.open(
+      `${API_URL}/download?formatUrl=${encodeURIComponent(url)}`,
+      "_blank"
+    );
   };
 
   return (
@@ -117,9 +117,9 @@ const YouTubeDownloader = () => {
         </button>
       </div>
       {loading && (
-        <div className="text-center text-blue-500 animate-pulse">
-          <p>Video yükleniyor, lütfen bekleyiniz...</p>
-        </div>
+        <p className="text-center text-blue-500 animate-pulse">
+          Video yükleniyor...
+        </p>
       )}
       {error && (
         <div className="flex items-center text-red-500 mb-4 p-3 bg-gray-800 rounded-lg">
@@ -167,7 +167,7 @@ const YouTubeDownloader = () => {
             <button
               onClick={() => handleDownload(mp3Quality)}
               disabled={!mp3Quality}
-              className="flex-1 bg-yellow-500 hover:bg-yellow-600 p-3 rounded-lg disabled:opacity-50 transition shadow-lg hover:shadow-xl flex items-center justify-center cursor-pointer"
+              className="flex-1 bg-yellow-500 hover:bg-yellow-600 p-3 rounded-lg disabled:opacity-50 transition shadow-lg hover:shadow-xl flex items-center justify-center"
             >
               <Music className="mr-2" size={20} /> MP3 İndir
             </button>
