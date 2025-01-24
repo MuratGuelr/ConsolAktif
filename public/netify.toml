@@ -1,4 +1,7 @@
-[[redirects]]
-from="*/"
-to="/index.html"
-status=200
+[build]
+  functions = "server"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Content-Type = "application/javascript"

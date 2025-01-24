@@ -4,10 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"vite\" \"node server.js\"",
-    "build": "vite build",
+    "dev": "vite",
+    "build": "vite build && mv dist/index.html dist/200.html",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "serve": "netlify dev"
   },
   "dependencies": {
     "@react-spring/web": "^9.7.5",
