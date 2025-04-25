@@ -9,7 +9,7 @@ export default function Hero() {
             haberdar olabilir veya yeni haberlere ulaşabilirsin.{" "}
             <span className="text-xs text-base-primary">(Şüpheli : 🤔)</span>
           </p>
-          <button className="btn btn-primary">Get Started</button>
+          <button className="btn btn-primary">Başla</button>
         </div>
       </div>
     </div>
