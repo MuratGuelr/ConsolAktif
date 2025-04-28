@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function NotFound() {
   return (
     <>
@@ -13,9 +15,9 @@ export default function NotFound() {
             ile geri gönderebiliriz 😁
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6">
-            <a href="/" className="btn btn-soft btn-accent">
+            <Link to="/" className="btn btn-soft btn-accent">
               Anasayfaya Dön
-            </a>
+            </Link>
           </div>
         </div>
       </main>

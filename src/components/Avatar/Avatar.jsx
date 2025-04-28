@@ -1,12 +1,20 @@
 import React from "react";
+import useGetUser from "../../hooks/useGetUser";
 
 const Avatar = () => {
+  const { user, loading } = useGetUser();
   return (
-    <div className="avatar avatar-online">
-      <div className="rounded-full">
-        <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
-      </div>
-    </div>
+    <>
+      {loading ? (
+        <span className="loading loading-spinner loading-lg"></span>
+      ) : (
+        <div className="avatar avatar-online">
+          <div className="rounded-full">
+            <img src={user.photoURL} />
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

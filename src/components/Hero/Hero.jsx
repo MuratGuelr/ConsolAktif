@@ -1,17 +1,38 @@
+import { Link } from "react-router-dom";
+import useGetUser from "../../hooks/useGetUser";
+
 export default function Hero() {
+  const { user, loading } = useGetUser();
+
   return (
-    <div className="hero bg-base-200 pt-10">
-      <div className="hero-content text-center">
-        <div className="max-w-md">
-          <h1 className="text-5xl font-bold">Merhaba 👋</h1>
-          <p className="py-6">
-            Websitem üzerinden uygulamalarıma ulaşabilir, yeni videolarımdan
-            haberdar olabilir veya yeni haberlere ulaşabilirsin.{" "}
-            <span className="text-xs text-base-primary">(Şüpheli : 🤔)</span>
-          </p>
-          <button className="btn btn-primary">Başla</button>
+    <>
+      {loading ? (
+        <div className="flex justify-center py-10">
+          <span className="loading loading-spinner loading-xl"></span>
         </div>
-      </div>
-    </div>
+      ) : (
+        <div className="hero bg-base-200 pt-10">
+          <div className="hero-content text-center">
+            <div className="max-w-md">
+              <h1 className="text-5xl font-bold">Merhaba 👋</h1>
+              <p className="py-6">
+                Websitem üzerinden uygulamalarıma ulaşabilir, yeni videolarımdan
+                haberdar olabilir veya yeni haberlere ulaşabilirsin.{" "}
+                <span className="text-xs text-base-primary">
+                  (Şüpheli : 🤔)
+                </span>
+              </p>
+              <button className="btn btn-primary">
+                {!user ? (
+                  <Link to="/login">Başla</Link>
+                ) : (
+                  <Link to="/profile">Başla</Link>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
