@@ -22,13 +22,15 @@ export default function Hero() {
                   (Şüpheli : 🤔)
                 </span>
               </p>
-              <button className="btn btn-primary">
-                {!user ? (
-                  <Link to="/login">Başla</Link>
-                ) : (
-                  <Link to="/profile">Başla</Link>
-                )}
-              </button>
+              {!user ? (
+                <Link to="/login">
+                  <button className="btn btn-primary">Başla</button>
+                </Link>
+              ) : (
+                <Link to="/profile">
+                  <button className="btn btn-primary">Başla</button>
+                </Link>
+              )}
             </div>
           </div>
         </div>

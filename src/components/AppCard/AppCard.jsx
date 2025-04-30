@@ -6,7 +6,7 @@ const AppCard = ({ title, image, description, URL, isNew, category }) => {
     <div className="card bg-base-200 w-96 shadow-sm p-1">
       <Link to={URL}>
         <figure>
-          <img src={image} alt={title} />
+          <img src={image} alt={title} className="h-72 object-contain" />
         </figure>
         <div className="card-body">
           <h2 className="card-title">

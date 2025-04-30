@@ -2,6 +2,7 @@ import React from "react";
 import { auth, googleProvider } from "../../firebase/firebase";
 import { signInWithPopup } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -10,7 +11,9 @@ const Login = () => {
     try {
       await signInWithPopup(auth, googleProvider);
       navigate("/");
+      toast.success("Başarıyla Giriş Yapıldı 😎👌");
     } catch (error) {
+      toast.error("Sanırım bir problemimiz var gibi 🫤");
       console.log("Error", error.message);
     }
   };

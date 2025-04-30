@@ -35,8 +35,7 @@ const Profile = () => {
         <div className="flex justify-center py-10">
           <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 indicator">
             <span className="indicator-item badge badge-secondary -mt-3 text-xs">
-              {(timeAgo && `${timeAgo.substring(8)} oluşturuldu`) ||
-                "Yükleniyor..."}
+              {(timeAgo && `Hesap ${timeAgo} oluşturuldu`) || "Yükleniyor..."}
             </span>
             <div className="flex justify-center py-2">
               <Avatar />

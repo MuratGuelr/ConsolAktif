@@ -5,10 +5,23 @@ import App from "./App.jsx";
 import Footer from "./pages/Footer/Footer.jsx";
 import Navbar from "./components/Navbar/Navbar.jsx";
 import { BrowserRouter } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
       <Navbar />
       <App />
       <Footer />

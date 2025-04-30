@@ -4,6 +4,8 @@ import useGetUser from "../../hooks/useGetUser";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase/firebase";
 import { Link, useNavigate } from "react-router-dom";
+import { IoAppsOutline } from "react-icons/io5";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
   const { user, loading } = useGetUser();
@@ -13,6 +15,7 @@ const Navbar = () => {
     try {
       await signOut(auth);
       navigate("/");
+      toast.success("Tekrar Görüşmek Üzere 👋");
     } catch (error) {
       console.log("Error", error.message);
     }
@@ -23,6 +26,12 @@ const Navbar = () => {
       <div className="flex-1">
         <Link to="/" className="btn btn-ghost text-xl">
           ConsolAktif
+        </Link>
+      </div>
+
+      <div className="flex-1">
+        <Link to={"/apps"} className="btn btn-ghost text-xl">
+          <IoAppsOutline size={25} />
         </Link>
       </div>
 
