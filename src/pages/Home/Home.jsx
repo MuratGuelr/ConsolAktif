@@ -1,11 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Hero from "../../components/Hero/Hero";
-import Carousel from "../../components/Carousel/Carousel";
 
 const Home = () => {
+  useEffect(() => {
+    document.title = "ConsolAktif Anasayfa";
+    const favicon = document.querySelector("link[rel~='icon']");
+    if (favicon) {
+      favicon.href = "/logo/logo.png";
+    }
+  }, []);
+
   return (
     <div>
-      <Carousel />
       <Hero />
     </div>
   );

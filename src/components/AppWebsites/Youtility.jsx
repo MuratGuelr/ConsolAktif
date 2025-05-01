@@ -1,7 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const Youtility = () => {
+  useEffect(() => {
+    document.title = "ConsolAktif Youtility";
+    const favicon = document.querySelector("link[rel~='icon']");
+    if (favicon) {
+      favicon.href = "/apps/Youtility/icon.ico";
+    }
+  }, []);
   return (
     <div className="mockup-window border border-gray-500 w-fit m-10 mx-auto bg-gray-700">
       <div className="grid place-content-center border-t border-gray-500 h-full p-5">

@@ -22,7 +22,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="navbar bg-base-200 shadow-sm">
+    <div className="navbar bg-base-200 shadow-md">
       <div className="flex-1">
         <Link to="/" className="btn btn-ghost text-xl">
           ConsolAktif
@@ -58,7 +58,7 @@ const Navbar = () => {
 
             <ul
               tabIndex={0}
-              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
+              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-200 rounded-box w-52"
             >
               <li>
                 <Link to="/profile" className="justify-between">

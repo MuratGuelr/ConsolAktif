@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 export default function NotFound() {
   return (
     <>
-      <main className="grid min-h-full place-items-center px-6 py-24 sm:py-32 lg:px-8 bg-base-300">
+      <main className="grid h-screen -mt-36 -mb-36 place-items-center bg-base-300">
         <div className="text-center">
           <p className="text-base font-semibold text-indigo-600">404</p>
           <h1 className="mt-4 text-5xl font-semibold tracking-tight text-balance sm:text-7xl text-neutral-content">

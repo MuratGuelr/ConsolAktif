@@ -1,10 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { auth, googleProvider } from "../../firebase/firebase";
 import { signInWithPopup } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const Login = () => {
+  useEffect(() => {
+    document.title = "ConsolAktif Giriş Yap";
+    const favicon = document.querySelector("link[rel~='icon']");
+    if (favicon) {
+      favicon.href = "/logo/logo.png";
+    }
+  }, []);
+
   const navigate = useNavigate();
 
   const handleGoogleLogin = async () => {
@@ -19,13 +27,13 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-18 lg:px-8 pb-45">
+    <div className="flex flex-1 flex-col justify-center h-screen -mt-36 -mb-36">
       <div className="card bg-base-300 w-96 shadow-sm m-auto">
         <div className="card-body">
           <div className="sm:mx-auto sm:w-full sm:max-w-sm text-center">
             <div className="avatar">
               <img
-                alt="Your Company"
+                alt="ConsolAktif"
                 src="https://yt3.googleusercontent.com/M-YH7dPjl40d2cXHK30at3hYyn1seO_RO4MJ-ee8FMN6wHrRQ6ZVaX48JIwHt0BqZSA3do8N2g=s160-c-k-c0x00ffffff-no-rj"
                 className="w-24 rounded-full"
               />

@@ -1,7 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import AppCard from "../../components/AppCard/AppCard";
 
 const Apps = () => {
+  useEffect(() => {
+    document.title = "ConsolAktif Uygulamalar";
+    const favicon = document.querySelector("link[rel~='icon']");
+    if (favicon) {
+      favicon.href = "/apps/auto-editor/all.png";
+    }
+  }, []);
+
   const App1 = {
     title: "Auto-Editor",
     image:
