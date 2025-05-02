@@ -8,6 +8,8 @@ import Profile from "./pages/Profile/Profile";
 import Apps from "./pages/Apps/Apps";
 import AutoEditor from "./components/AppWebsites/AutoEditor";
 import Youtility from "./components/AppWebsites/Youtility";
+import FreeExtensions from "./components/AppWebsites/FreeExtensions";
+import AppMarket from "./components/AppWebsites/AppMarket";
 
 function App() {
   const { user, loading } = useGetUser();
@@ -24,6 +26,8 @@ function App() {
         <Route path="/apps" element={<Apps />} />
         <Route path="/auto-editor" element={<AutoEditor />} />
         <Route path="/youtility" element={<Youtility />} />
+        <Route path="/free-extensions" element={<FreeExtensions />} />
+        <Route path="/app-market" element={<AppMarket />} />
       </Routes>
     </div>
   );

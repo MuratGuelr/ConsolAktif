@@ -15,7 +15,7 @@ export default function Hero() {
           <div className="hero-content flex-col lg:flex-row-reverse gap-10">
             <a href="https://youtu.be/W0sN_QXErjM" target="_blank">
               <img
-                src="/apps/video/video1.png"
+                src="/apps/video/video1.jpg"
                 className="max-w-sm rounded-lg shadow-2xl hover:scale-105 hover:saturate-150 transition-all duration-300 "
               />
             </a>

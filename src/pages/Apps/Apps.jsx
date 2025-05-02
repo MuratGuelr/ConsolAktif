@@ -38,24 +38,73 @@ const Apps = () => {
     ],
   };
 
+  const App3 = {
+    title: "Eklenti Marketi",
+    image: "./apps/auto-editor/all.png",
+    description:
+      "Bu website sayesinde edit programınıza özel ücretli & ücretsiz eklentileri kolaylıkla bulabilirsiniz.",
+    URL: "/free-extensions",
+    isNew: true,
+    category: [
+      { category: "Eklenti" },
+      { category: "Website" },
+      { category: "Kolay" },
+    ],
+  };
+
+  const App4 = {
+    title: "Uygulama Marketi",
+    image: "./apps/auto-editor/windows.png",
+    description:
+      "Bu website sayesinde bütün uygulamaları bulabilir ve kolayca yükleyebilirsiniz.",
+    URL: "/app-market",
+    isNew: true,
+    category: [
+      { category: "Eklenti" },
+      { category: "Website" },
+      { category: "Kolay" },
+    ],
+  };
+
   return (
-    <div className="flex justify-center py-5 gap-5">
-      <AppCard
-        title={App1.title}
-        image={App1.image}
-        description={App1.description}
-        URL={App1.URL}
-        isNew={App1.isNew}
-        category={App1.category}
-      />
-      <AppCard
-        title={App2.title}
-        image={App2.image}
-        description={App2.description}
-        URL={App2.URL}
-        isNew={App2.isNew}
-        category={App2.category}
-      />
+    <div className="mx-auto max-w-7xl py-10 px-4">
+      <div
+        className="grid gap-4"
+        style={{ gridTemplateColumns: "repeat(auto-fit, minmax(270px, 1fr))" }}
+      >
+        <AppCard
+          title={App1.title}
+          image={App1.image}
+          description={App1.description}
+          URL={App1.URL}
+          isNew={App1.isNew}
+          category={App1.category}
+        />
+        <AppCard
+          title={App2.title}
+          image={App2.image}
+          description={App2.description}
+          URL={App2.URL}
+          isNew={App2.isNew}
+          category={App2.category}
+        />
+        <AppCard
+          title={App3.title}
+          image={App3.image}
+          description={App3.description}
+          URL={App3.URL}
+          isNew={App3.isNew}
+          category={App3.category}
+        />
+        <AppCard
+          title={App4.title}
+          image={App4.image}
+          description={App4.description}
+          URL={App4.URL}
+          isNew={App4.isNew}
+          category={App4.category}
+        />
+      </div>
     </div>
   );
 };

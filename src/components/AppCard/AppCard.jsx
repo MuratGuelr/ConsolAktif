@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const AppCard = ({ title, image, description, URL, isNew, category }) => {
   return (
-    <div className="card bg-base-200 w-96 shadow-sm p-1">
+    <div className="card bg-base-200 shadow-sm p-1">
       <Link to={URL}>
         <figure>
           <img src={image} alt={title} className="h-72 object-contain" />
