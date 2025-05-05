@@ -27,6 +27,14 @@ const FreeExtensions = () => {
 
   const { user, isAdmin, login, logout, error: authError } = useAuth();
 
+  useEffect(() => {
+    document.title = "ConsolAktif Eklenti Marketi";
+    const favicon = document.querySelector("link[rel~='icon']");
+    if (favicon) {
+      favicon.href = "/apps/auto-editor/all.png";
+    }
+  }, []);
+
   // Firebase hook with custom options
   const { data, loading, error, addTool, updateTool, deleteTool } =
     useFirebaseVideoTools(searchQuery, category, { sort, limit: 20 });

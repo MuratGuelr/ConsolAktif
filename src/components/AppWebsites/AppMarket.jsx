@@ -39,6 +39,14 @@ const AppMarket = () => {
 
   const { user, isAdmin } = useAuth();
 
+  useEffect(() => {
+    document.title = "ConsolAktif Windows Uygulama Marketi";
+    const favicon = document.querySelector("link[rel~='icon']");
+    if (favicon) {
+      favicon.href = "/apps/platforms/Windows.png";
+    }
+  }, []);
+
   // Firebase hook with custom options
   const { data, loading, error, addApp, updateApp, deleteApp } =
     useFirebaseApps(searchQuery, category, { sort, limit: 30 });
