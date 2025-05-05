@@ -501,7 +501,7 @@ const ToolForm = ({ initialData, onSubmit, onCancel }) => {
             <span className="label-text">İkon URL</span>
           </label>
           <input
-            type="url"
+            type="text"
             name="icon"
             value={formData.icon}
             onChange={handleChange}

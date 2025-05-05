@@ -2,26 +2,78 @@ import React, { useState, useEffect } from "react";
 import { useFirebaseVideoTools } from "../../hooks/useFirebaseVideoTools";
 import { useAuth } from "../../hooks/useAuth";
 import ToolForm from "../../components/ToolForm/ToolForm";
-import Login from "../../pages/Login/Login";
 import { FaPlus, FaEdit, FaTrash, FaSearch, FaFilter } from "react-icons/fa";
 import { GoSortAsc } from "react-icons/go";
 import { FaStar } from "react-icons/fa6";
 import { IoAlertCircle } from "react-icons/io5";
 
 const FreeExtensions = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchInput, setSearchInput] = useState(""); // Kullanıcı girdisi için
+  const [searchQuery, setSearchQuery] = useState(""); // Firebase sorgusu için
   const [category, setCategory] = useState("");
   const [sort, setSort] = useState("rating");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [currentTool, setCurrentTool] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [toolToDelete, setToolToDelete] = useState(null);
+  const [animateResults, setAnimateResults] = useState(false);
+  const [prevSearchParams, setPrevSearchParams] = useState({
+    query: "",
+    category: "",
+    sort: "rating",
+  });
+
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
   const { user, isAdmin, login, logout, error: authError } = useAuth();
 
   // Firebase hook with custom options
   const { data, loading, error, addTool, updateTool, deleteTool } =
     useFirebaseVideoTools(searchQuery, category, { sort, limit: 20 });
+
+  // Trigger animation after initial data load
+  useEffect(() => {
+    if (data && !loading && !initialLoadComplete) {
+      // Short delay to ensure DOM is ready
+      setTimeout(() => {
+        setAnimateResults(true);
+        setInitialLoadComplete(true);
+      }, 100);
+    }
+  }, [data, loading, initialLoadComplete]);
+
+  // Arama inputu değiştiğinde debounce ile sorguyu güncelle
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchQuery(searchInput);
+    }, 300); // 300ms gecikme ile sorguyu güncelle
+
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  // Arama parametreleri değiştiğinde animasyon kontrolü
+  useEffect(() => {
+    // Arama parametreleri değiştiyse animasyonu başlat
+    if (
+      searchQuery !== prevSearchParams.query ||
+      category !== prevSearchParams.category ||
+      sort !== prevSearchParams.sort
+    ) {
+      setAnimateResults(false); // Önce animasyonu resetle
+
+      // Sonuçlar için bir sonraki render'da animasyonu etkinleştir
+      setTimeout(() => {
+        setAnimateResults(true);
+      }, 100);
+
+      // Önceki parametreleri güncelle
+      setPrevSearchParams({
+        query: searchQuery,
+        category: category,
+        sort: sort,
+      });
+    }
+  }, [searchQuery, category, sort]);
 
   // Handle form submission for adding/editing tools
   const handleFormSubmit = async (formData) => {
@@ -111,8 +163,8 @@ const FreeExtensions = () => {
             </label>
             <input
               type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Program veya eklenti ara..."
               className="input input-bordered w-full"
             />
@@ -173,51 +225,58 @@ const FreeExtensions = () => {
 
         {/* Results Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {data?.items.map((item) => (
+          {data?.items.map((item, index) => (
             <div
               key={item.id}
-              className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 mt-5"
+              className={`card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 border-2 ${
+                item.price === 0
+                  ? "border-success/30 hover:border-success"
+                  : "border-info/30 hover:border-info"
+              } hover:scale-[1.02] ${
+                animateResults ? "animate-fade-in-up" : "opacity-0"
+              }`}
+              style={{
+                animationDelay: `${index * 100}ms`,
+                animationFillMode: "forwards",
+              }}
             >
-              {/* Admin Controls */}
-              {isAdmin && (
-                <div className="absolute top-2 right-2 flex gap-1">
-                  <button
-                    className="btn btn-circle btn-sm btn-ghost"
-                    onClick={() => handleEditTool(item)}
-                  >
-                    <FaEdit size={16} />
-                  </button>
-                  <button
-                    className="btn btn-circle btn-sm btn-ghost text-error"
-                    onClick={() => handleDeleteTool(item)}
-                  >
-                    <FaTrash size={16} />
-                  </button>
-                </div>
-              )}
+              <div className="card-body p-5">
+                {/* Admin Kontrolleri - Hover'da görünür */}
+                {isAdmin && (
+                  <div className="absolute top-3 right-3 flex gap-2 opacity-100 transition-all duration-300">
+                    <button
+                      className="btn btn-circle btn-xs btn-ghost bg-base-200 hover:bg-base-300"
+                      onClick={() => handleEditTool(item)}
+                      title="Düzenle"
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      className="btn btn-circle btn-xs btn-ghost bg-red-500 hover:bg-error hover:text-white"
+                      onClick={() => handleDeleteTool(item)}
+                      title="Sil"
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
+                )}
 
-              <div
-                className={`card-body rounded-md border-2 ${
-                  item.price === 0 ? "border-success" : "border-info"
-                }`}
-              >
-                <span
-                  className={`${
-                    item.price === 0
-                      ? "bg-success text-slate-800 font-medium"
-                      : "bg-info text-slate-800 font-medium"
-                  } indicator-top badge badge-primary -mt-10`}
-                >
-                  {item.price === 0 ? "Ücretsiz" : `${item.price}$`}
-                </span>
-                <div className="flex items-center mb-3">
+                {/* Üst Kısım: Logo, Başlık ve Fiyat */}
+                <div className="flex items-center gap-3 mb-3">
+                  {/* Logo */}
                   {item.icon && (
-                    <div className="avatar mr-3">
-                      <div className="w-16 h-16 rounded-xl">
+                    <div className="avatar">
+                      <div
+                        className={`w-12 h-12 rounded-lg bg-base-200 transition-all duration-300 ${
+                          item.price === 0
+                            ? "hover:bg-success/10"
+                            : "hover:bg-info/10"
+                        }`}
+                      >
                         <img
                           src={item.icon}
-                          alt={`${item.name} logo`}
-                          className="object-contain"
+                          alt={`${item.name}`}
+                          className="object-contain p-1"
                           onError={(e) => {
                             e.target.onerror = null;
                             e.target.src =
@@ -228,22 +287,27 @@ const FreeExtensions = () => {
                       </div>
                     </div>
                   )}
+
+                  {/* Başlık ve Yayıncı */}
+                  <div className="flex-1">
+                    <h2 className="font-bold text-lg">{item.name}</h2>
+                    <p className="text-xs opacity-70">{item.publisher}</p>
+                  </div>
+
+                  {/* Fiyat */}
                   <div>
-                    <h2 className="card-title">
-                      {item.name} {item.version}
-                    </h2>
-                    <div className="text-sm opacity-70">{item.publisher}</div>
+                    <span
+                      className={`badge ${
+                        item.price === 0 ? "badge-success" : "badge-info"
+                      } badge-lg`}
+                    >
+                      {item.price === 0 ? "Ücretsiz" : `${item.price}$`}
+                    </span>
                   </div>
                 </div>
-                <div className="mb-3 flex flex-wrap gap-2">
-                  <span
-                    className={`badge ${
-                      item.price === 0 ? "badge-success" : "badge-info"
-                    }`}
-                  >
-                    {item.price === 0 ? "Ücretsiz" : `${item.price}$`}
-                  </span>
 
+                {/* Kategori ve Puan */}
+                <div className="flex gap-2 mb-3">
                   <span className="badge badge-outline">
                     {item.category === "software"
                       ? "Yazılım"
@@ -252,96 +316,107 @@ const FreeExtensions = () => {
                       : "Şablon"}
                   </span>
 
-                  <span className="badge badge-warning gap-1">
-                    <div className="flex">
-                      {[...Array(Math.round(item.rating))].map((_, i) => (
-                        <FaStar
-                          key={i}
-                          size={12}
-                          fill="currentColor"
-                          stroke="none"
-                        />
-                      ))}
-                    </div>
-                    <span className="text-xs opacity-80">({item.rating})</span>
-                  </span>
+                  {/* Puan */}
+                  <div className="badge badge-warning gap-1">
+                    <FaStar size={12} />
+                    <span>{item.rating}</span>
+                  </div>
+
+                  {/* Versiyon */}
+                  {item.version && (
+                    <span className="badge badge-ghost">{item.version}</span>
+                  )}
                 </div>
-                <p className="text-md opacity-85 mb-3 line-clamp-2 bg-base-300 p-2 rounded-md">
+
+                {/* Açıklama */}
+                <p className="text-sm mb-4 line-clamp-2 bg-base-200/50 p-2 rounded">
                   {item.description}
                 </p>
-                {item.features && (
-                  <div className="mb-3">
-                    <h4 className="text-md font-semibold opacity-80 mb-1">
-                      Özellikler:
-                    </h4>
+
+                {/* Özellikler (Kompakt) */}
+                {item.features && item.features.length > 0 && (
+                  <div className="mb-4">
                     <div className="flex flex-wrap gap-1">
                       {item.features.slice(0, 3).map((feature, idx) => (
-                        <span key={idx} className="badge badge-ghost badge-sm">
+                        <span
+                          key={idx}
+                          className="badge badge-sm badge-ghost hover:bg-base-300 transition-colors duration-300"
+                        >
                           {feature}
                         </span>
                       ))}
                       {item.features.length > 3 && (
-                        <span className="badge badge-ghost badge-sm">
-                          +{item.features.length - 3} daha
+                        <span className="badge badge-sm badge-ghost hover:bg-base-300 transition-colors duration-300">
+                          +{item.features.length - 3}
                         </span>
                       )}
                     </div>
                   </div>
                 )}
-                <div className="mx-auto">
-                  {item.compatibleWith && (
-                    <div className="text-md opacity-80 mb-3">
-                      <span className="font-semibold">
-                        Uyumlu Olduğu Yazılımlar:
-                      </span>{" "}
-                      <div className="flex flex-row gap-2 justify-center">
+
+                {/* İki Sütuna Bölünmüş Alt Kısım */}
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  {/* Uyumlu Yazılımlar */}
+                  {item.compatibleWith && item.compatibleWith.length > 0 && (
+                    <div>
+                      <p className="text-xs font-medium mb-2 text-center">
+                        Uyumlu Yazılımlar
+                      </p>
+                      <div className="flex flex-wrap justify-center gap-1">
                         {item.compatibleWith.map((sw) => (
-                          <img
-                            src={`./apps/programs/${sw}.png`}
-                            alt={sw}
-                            className={`w-10 h-10 bg-base-200 p-1 rounded-md transition-all duration-300 hover:scale-105 cursor-pointer ${
-                              item.price === 0
-                                ? "hover:bg-success"
-                                : "hover:bg-info"
-                            }`}
-                          />
+                          <div key={sw} className="tooltip" data-tip={sw}>
+                            <img
+                              src={`./apps/programs/${sw}.png`}
+                              alt={sw}
+                              className={`w-8 h-8 rounded bg-base-200 p-1 transition-all duration-300 hover:scale-110 ${
+                                item.price === 0
+                                  ? "hover:bg-success/20"
+                                  : "hover:bg-info/20"
+                              }`}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Platformlar */}
+                  {item.platform && item.platform.length > 0 && (
+                    <div>
+                      <p className="text-xs font-medium mb-2 text-center">
+                        Platformlar
+                      </p>
+                      <div className="flex flex-wrap justify-center gap-1">
+                        {item.platform.map((platform) => (
+                          <div
+                            key={platform}
+                            className="tooltip"
+                            data-tip={platform}
+                          >
+                            <img
+                              src={`./apps/platforms/${platform}.png`}
+                              alt={platform}
+                              className={`w-8 h-8 rounded bg-base-200 p-1 transition-all duration-300 hover:scale-110 ${
+                                item.price === 0
+                                  ? "hover:bg-success/20"
+                                  : "hover:bg-info/20"
+                              }`}
+                            />
+                          </div>
                         ))}
                       </div>
                     </div>
                   )}
                 </div>
 
-                <div className="mx-auto">
-                  <div className="card-actions mb-2 text-md opacity-80">
-                    <span className="font-semibold">
-                      Uyumlu Olduğu Platformlar:
-                    </span>{" "}
-                  </div>
-                  <div className="card-actions mb-2">
-                    <div className="flex flex-row gap-1">
-                      {item.platform.map((i) => (
-                        <img
-                          src={`./apps/platforms/${i}.png`}
-                          alt={i}
-                          className={`w-14 h-14 bg-base-200 p-1 rounded-md transition-all duration-300 hover:scale-105 cursor-pointer ${
-                            item.price === 0
-                              ? "hover:bg-success"
-                              : "hover:bg-info"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                {/* Buton */}
                 <a
                   href={item.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`btn ${
-                    item.price === 0
-                      ? "btn-success text-md"
-                      : "btn-info text-md"
-                  }`}
+                  className={`btn btn-sm w-full ${
+                    item.price === 0 ? "btn-success" : "btn-info"
+                  } hover:brightness-110 transition-all duration-300 hover:shadow`}
                 >
                   Sitesine Git
                 </a>
