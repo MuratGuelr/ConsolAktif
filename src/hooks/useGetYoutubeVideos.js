@@ -3,7 +3,6 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import { format } from "date-fns";
 
-// Süreyi anlaşılır formata çevirmek için fonksiyon
 const parseDuration = (isoDuration) => {
   const match = isoDuration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
 

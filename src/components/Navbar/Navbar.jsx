@@ -29,7 +29,7 @@ const Navbar = () => {
         </Link>
       </div>
 
-      <div className="flex-1">
+      <div className="flex">
         <Link to={"/apps"} className="btn btn-ghost text-xl">
           <IoAppsOutline size={25} />
         </Link>

@@ -77,7 +77,7 @@ const Youtility = () => {
           <div className="flex justify-center mt-5 relative hover:scale-105 transition-all duration-200 cursor-pointer -mb-20">
             <a href="https://github.com/MuratGuelr/Youtility/releases/download/v4.0.0/Youtility_win_x64-Turkish.exe">
               <img
-                src="./apps/Youtility/design.png"
+                src="../apps/Youtility/design.png"
                 alt="youtility"
                 className="w-xl"
               />
