@@ -11,18 +11,22 @@ import Youtility from "./components/AppWebsites/Youtility";
 import FreeExtensions from "./components/AppWebsites/FreeExtensions";
 import AppMarket from "./components/AppWebsites/AppMarket";
 import Videos from "./pages/Videos/Videos";
-import useGetYoutubeVideos from "./hooks/useGetYoutubeVideos";
-import Forum from "./pages/Forum/Forum";
-import PostDetail from "./pages/Forum/PostDetail";
-import PostForm from "./pages/Forum/PostForm";
-import useAuth from "./hooks/useAuth";
+import ForumPage from "./pages/ForumPage/ForumPage";
+import AdminPage from "./pages/AdminPage/AdminPage";
+import SolutionDetailPage from "./pages/SolutionDetailPage/SolutionDetailPage";
+import EditSolutionPage from "./pages/AdminPage/EditSolutionPage";
 
 function App() {
   const { user, loading } = useGetUser();
-  const { isAdmin } = useAuth();
-  const { videos, error } = useGetYoutubeVideos();
+  const isAdmin = user && user.email === import.meta.env.VITE_ADMIN_MAILS;
 
-  console.log(user);
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <span className="loading loading-lg loading-spinner text-primary"></span>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -39,13 +43,21 @@ function App() {
         <Route path="/videos" element={<Videos />} />
 
         {/* Forum Routes */}
-        <Route path="/forum" element={<Forum />} />
-        <Route path="/forum/post/:postId" element={<PostDetail />} />
+        <Route path="/forum" element={<ForumPage />} />
+        <Route
+          path="/forum/solution/:solutionId"
+          element={<SolutionDetailPage />}
+        />
+
+        {/* Admin Routes */}
         {isAdmin && (
-          <>
-            <Route path="/forum/new" element={<PostForm />} />
-            <Route path="/forum/edit/:postId" element={<PostForm />} />
-          </>
+          <Route path="/admin/add-solution" element={<AdminPage />} />
+        )}
+        {isAdmin && (
+          <Route
+            path="/admin/edit-solution/:solutionId"
+            element={<EditSolutionPage />}
+          />
         )}
       </Routes>
     </div>
