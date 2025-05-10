@@ -5,6 +5,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../../firebase/firebase";
 import { Link, useNavigate } from "react-router-dom";
 import { IoAppsOutline } from "react-icons/io5";
+import { FaComments } from "react-icons/fa";
 import { toast } from "react-toastify";
 
 const Navbar = () => {
@@ -29,8 +30,11 @@ const Navbar = () => {
         </Link>
       </div>
 
-      <div className="flex">
-        <Link to={"/apps"} className="btn btn-ghost text-xl">
+      <div className="flex gap-2">
+        <Link to="/forum" className="btn btn-ghost text-xl" title="Forum">
+          <FaComments size={22} />
+        </Link>
+        <Link to="/apps" className="btn btn-ghost text-xl" title="Uygulamalar">
           <IoAppsOutline size={25} />
         </Link>
       </div>

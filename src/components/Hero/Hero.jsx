@@ -14,9 +14,6 @@ export default function Hero() {
 
   useEffect(() => {
     if (youtubeVideos && youtubeVideos.length > 0) {
-      // Genellikle ilk video en son yüklenendir, ancak API'nin sıralamasına bağlı.
-      // 'publishDate' veya benzeri bir alana göre sıralayıp en yenisini almak daha garantili olabilir.
-      // useGetYoutubeVideos hook'u zaten sıralı getiriyorsa ilkini almak yeterli.
       setFeaturedVideo(youtubeVideos[0]);
     }
   }, [youtubeVideos]);
@@ -30,14 +27,11 @@ export default function Hero() {
           <span className="loading loading-spinner loading-xl"></span>
         </div>
       ) : (
-        // DaisyUI temalarından birini seçebilirsiniz: night, dracula, cyberpunk etc.
-        // html tag'ine data-theme="night" ekleyerek global tema belirleyebilirsiniz.
         <div
           className="hero min-h-screen bg-base-200"
           style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
         >
           {" "}
-          {/* İsteğe bağlı arka plan görseli */}
           <div className="hero-overlay bg-opacity-70"></div>
           <div className="hero-content text-center text-neutral-content py-10">
             <div className="max-w-3xl">
@@ -54,7 +48,6 @@ export default function Hero() {
               </h1>
               <p className="mb-5 mx-auto text-lg md:text-xl max-w-xl text-base-content-secondary">
                 {" "}
-                {/* DaisyUI v4+ için text-neutral-content yerine */}
                 Bilgisayar, yazılım ve teknoloji dünyasındaki sorularınıza en
                 güncel yanıtlar, yararlı uygulama rehberleri ve daha fazlası
                 burada!
@@ -93,7 +86,6 @@ export default function Hero() {
                 {user ? (
                   <Link to="/videos">
                     {" "}
-                    {/* /videos diye bir sayfanız olacağını varsayıyorum */}
                     <button className="btn btn-primary btn-lg text-lg px-8">
                       Tüm Videolar
                     </button>
@@ -107,7 +99,6 @@ export default function Hero() {
                 )}
                 <Link to="/apps">
                   {" "}
-                  {/* /apps sayfanız olduğunu varsayıyorum */}
                   <button className="btn btn-secondary btn-lg text-lg px-8">
                     Uygulamalar
                   </button>

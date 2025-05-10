@@ -6,6 +6,11 @@ import Footer from "./pages/Footer/Footer.jsx";
 import Navbar from "./components/Navbar/Navbar.jsx";
 import { BrowserRouter } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import { initializeFirebaseData } from "./firebase/initializeData";
+import "react-toastify/dist/ReactToastify.css";
+
+// Initialize Firebase data
+initializeFirebaseData().catch(console.error);
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

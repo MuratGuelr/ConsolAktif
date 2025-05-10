@@ -12,9 +12,14 @@ import FreeExtensions from "./components/AppWebsites/FreeExtensions";
 import AppMarket from "./components/AppWebsites/AppMarket";
 import Videos from "./pages/Videos/Videos";
 import useGetYoutubeVideos from "./hooks/useGetYoutubeVideos";
+import Forum from "./pages/Forum/Forum";
+import PostDetail from "./pages/Forum/PostDetail";
+import PostForm from "./pages/Forum/PostForm";
+import useAuth from "./hooks/useAuth";
 
 function App() {
   const { user, loading } = useGetUser();
+  const { isAdmin } = useAuth();
   const { videos, error } = useGetYoutubeVideos();
 
   console.log(user);
@@ -32,6 +37,16 @@ function App() {
         <Route path="/apps/free-extensions" element={<FreeExtensions />} />
         <Route path="/apps/app-market" element={<AppMarket />} />
         <Route path="/videos" element={<Videos />} />
+
+        {/* Forum Routes */}
+        <Route path="/forum" element={<Forum />} />
+        <Route path="/forum/post/:postId" element={<PostDetail />} />
+        {isAdmin && (
+          <>
+            <Route path="/forum/new" element={<PostForm />} />
+            <Route path="/forum/edit/:postId" element={<PostForm />} />
+          </>
+        )}
       </Routes>
     </div>
   );
