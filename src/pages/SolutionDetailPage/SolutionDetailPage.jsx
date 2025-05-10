@@ -67,6 +67,12 @@ const SolutionDetailPage = () => {
   const isAdmin = user && user.email === import.meta.env.VITE_ADMIN_MAILS;
 
   useEffect(() => {
+    document.title = "ConsolAktif | Sorun Çözümleri";
+    const favicon = document.querySelector("link[rel~='icon']");
+    favicon.href = "/logo/logo.png";
+  }, []);
+
+  useEffect(() => {
     setIsLoadingSolution(true);
     setSolutionError(null);
     const fetchSolution = async () => {
@@ -215,8 +221,8 @@ const SolutionDetailPage = () => {
           <div className="p-6 md:p-10">
             {/* Header Section: Title & Admin Actions */}
             <header className="mb-6 pb-4 border-b border-base-300">
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-3">
-                <h1 className="text-3xl lg:text-4xl font-bold text-primary mb-3 md:mb-0 break-words">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-3 ">
+                <h1 className="text-3xl lg:text-4xl font-bold mb-3 md:mb-0 break-words text-primary">
                   {solution.title}
                 </h1>
                 {isAdmin && (
@@ -246,8 +252,12 @@ const SolutionDetailPage = () => {
               {/* Metadata Section */}
               <div className="flex flex-wrap items-center text-sm text-base-content opacity-80 gap-x-4 gap-y-2">
                 <span className="flex items-center">
-                  <FaUser className="mr-2 text-secondary" />
-                  {solution.authorEmail || "Admin"}
+                  <img
+                    src={"/logo/logo.png"}
+                    alt={solution.authorName}
+                    className="w-6 h-6 rounded-full mr-2 border-1 border-secondary"
+                  />
+                  ConsolAktif
                 </span>
                 <span className="flex items-center">
                   <FaCalendarAlt className="mr-2 text-secondary" />
@@ -276,11 +286,11 @@ const SolutionDetailPage = () => {
 
             {/* Main Content Section */}
             {solution.shortDescription && (
-              <section className="mb-8">
-                <h2 className="text-2xl font-semibold mb-3 text-accent">
+              <section className="mb-8 p-4 rounded-lg bg-accent/10">
+                <h2 className="text-2xl font-semibold mb-2 text-accent">
                   Özet
                 </h2>
-                <div className="prose prose-sm md:prose-base max-w-none text-base-content opacity-90">
+                <div className="prose prose-sm md:prose-base max-w-none text-base-content opacity-90 ml-2">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {solution.shortDescription}
                   </ReactMarkdown>
@@ -289,22 +299,19 @@ const SolutionDetailPage = () => {
             )}
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-3 text-accent">
-                Detaylar
-              </h2>
               <div>
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
                     h1: ({ node, ...props }) => (
                       <h1
-                        className="text-4xl font-bold my-5 text-primary"
+                        className="text-4xl font-bold my-5 text-secondary"
                         {...props}
                       />
                     ),
                     h2: ({ node, ...props }) => (
                       <h2
-                        className="text-3xl font-bold my-4 text-primary"
+                        className="text-3xl font-bold my-4 text-accent"
                         {...props}
                       />
                     ),
@@ -419,7 +426,7 @@ const SolutionDetailPage = () => {
             </section>
 
             {solution.videoLink && (
-              <section className="mb-8">
+              <section className="mb-8 p-4 rounded-lg bg-accent/10">
                 <h2 className="text-2xl font-semibold mb-4 text-accent">
                   İlgili Video
                 </h2>

@@ -49,6 +49,12 @@ const ForumPage = () => {
   ); // Default to 'All Categories'
   const [selectedTag, setSelectedTag] = useState(""); // Single tag for now
 
+  useEffect(() => {
+    document.title = "ConsolAktif | Forum & Çözümler";
+    const favicon = document.querySelector("link[rel~='icon']");
+    favicon.href = "/logo/logo.png";
+  }, []);
+
   // Fetch solutions for the main grid (filtered and sorted)
   useEffect(() => {
     setIsLoading(true);

@@ -2,7 +2,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import VideoCard from "../../components/VideoCard/VideoCard";
 import useGetYoutubeVideos from "../../hooks/useGetYoutubeVideos";
-import { FaSortAlphaDown, FaSortAlphaDownAlt, FaFireAlt } from "react-icons/fa";
 
 const ITEMS_PER_PAGE = 25;
 
