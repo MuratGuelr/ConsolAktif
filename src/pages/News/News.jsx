@@ -214,7 +214,7 @@ export default function News() {
                 target="_blank"
                 rel="noopener noreferrer"
                 // Apply animation class and staggered delay
-                className="card bg-base-200 shadow-xl hover:shadow-2xl border border-transparent hover:border-primary/50 
+                className="card bg-base-300 shadow-xl hover:shadow-2xl border border-transparent hover:border-primary/50 
                            transform transition-all duration-300 ease-in-out hover:-translate-y-1 group animate-fade-in-up"
                 style={{ animationDelay: `${index * 100}ms` }} // Staggered delay
               >
