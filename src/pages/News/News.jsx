@@ -6,7 +6,6 @@ const FILTERS = [
   { label: "Haftanın Ücretsiz Oyunları", tag: "games" },
 ];
 
-const PLACEHOLDER_IMG = "https://placehold.co/400x300?text=No+Image";
 const ITEMS_PER_PAGE = 9; // src/data/newsService.js ile aynı sayı olmalı
 
 export default function News() {
@@ -16,6 +15,12 @@ export default function News() {
   const [error, setError] = useState(null);
   const [tag, setTag] = useState("technology");
   const [page, setPage] = useState(0);
+
+  useEffect(() => {
+    document.title = "ConsolAktif | Teknoloji Haberleri";
+    const favicon = document.querySelector("link[rel~='icon']");
+    favicon.href = "/logo/logo.png";
+  }, []);
 
   // Tüm haberleri tek seferde çek ve sakla
   useEffect(() => {
