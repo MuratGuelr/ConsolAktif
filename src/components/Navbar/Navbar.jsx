@@ -10,7 +10,7 @@ import {
   FaHome,
   FaPlusCircle,
 } from "react-icons/fa"; // Example icons
-
+import { FaNewspaper } from "react-icons/fa6";
 import { LuAppWindow } from "react-icons/lu";
 
 const Navbar = () => {
@@ -85,6 +85,18 @@ const Navbar = () => {
                 <FaComments className="mr-1" /> Forum
               </NavLink>
             </li>
+            <li className="mx-1">
+              <NavLink
+                to="/news"
+                className={({ isActive }) =>
+                  isActive
+                    ? `${activeClassName} rounded-md`
+                    : `${normalClassName} rounded-md`
+                }
+              >
+                <FaNewspaper className="mr-1" /> Haberler
+              </NavLink>
+            </li>
             {isAdmin && (
               <li>
                 <NavLink
@@ -143,6 +155,18 @@ const Navbar = () => {
               }
             >
               <FaComments className="mr-1" /> Forum
+            </NavLink>
+          </li>
+          <li className="mx-1">
+            <NavLink
+              to="/news"
+              className={({ isActive }) =>
+                isActive
+                  ? `${activeClassName} rounded-md`
+                  : `${normalClassName} rounded-md`
+              }
+            >
+              <FaNewspaper className="mr-1" /> Haberler
             </NavLink>
           </li>
           {isAdmin && (

@@ -15,6 +15,7 @@ import ForumPage from "./pages/ForumPage/ForumPage";
 import AdminPage from "./pages/AdminPage/AdminPage";
 import SolutionDetailPage from "./pages/SolutionDetailPage/SolutionDetailPage";
 import EditSolutionPage from "./pages/AdminPage/EditSolutionPage";
+import News from "./pages/News/News";
 
 function App() {
   const { user, loading } = useGetUser();
@@ -41,6 +42,7 @@ function App() {
         <Route path="/apps/free-extensions" element={<FreeExtensions />} />
         <Route path="/apps/app-market" element={<AppMarket />} />
         <Route path="/videos" element={<Videos />} />
+        <Route path="/news" element={<News />} />
 
         {/* Forum Routes */}
         <Route path="/forum" element={<ForumPage />} />
