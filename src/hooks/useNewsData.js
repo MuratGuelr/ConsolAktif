@@ -7,7 +7,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { db } from "../firebase/firebase"; // Assuming db is exported from here
-import { getAllNews } from "../data/newsService"; // Adjust path if needed
+import { getAllNews, getAllCategoriesNews } from "../data/newsService"; // Added import for getAllCategoriesNews
 
 const FETCH_HOURS = [8, 12, 18, 21]; // Allowed fetch hours
 
@@ -51,10 +51,20 @@ export function useNewsData(tag) {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
-      const cacheDocRef = doc(db, "newsCache", tag);
-      const latestSlotStartTime = getLatestSlotStartTime();
 
       try {
+        // Special case for "all" tag - fetch and combine news from all categories
+        if (tag === "all") {
+          const allCategoriesNews = await getAllCategoriesNews();
+          setNews(allCategoriesNews);
+          setLoading(false);
+          return;
+        }
+
+        // Regular fetching for specific category
+        const cacheDocRef = doc(db, "newsCache", tag);
+        const latestSlotStartTime = getLatestSlotStartTime();
+
         // 1. Check Firestore Cache
         const docSnap = await getDoc(cacheDocRef);
 
@@ -67,16 +77,30 @@ export function useNewsData(tag) {
 
           // Check if cache is valid for the current time slot today
           // Cache must exist, have articles, and be from today's latest applicable slot or later
-          if (cacheTimestamp >= latestSlotStartTime && cacheData.articles) {
-            console.log(`Using cached news for tag: ${tag}`);
+          if (
+            cacheTimestamp >= latestSlotStartTime &&
+            cacheData.articles &&
+            cacheData.articles.length > 0
+          ) {
             setNews(cacheData.articles);
             setLoading(false);
             return; // Use cached data
           } else {
-            console.log(`Cache outdated for tag: ${tag}. Fetching new data.`);
+            // Eğer önbellek boşsa veya güncel değilse
+            if (cacheData.articles && cacheData.articles.length === 0) {
+              console.log(
+                `useNewsData: Cache for "${tag}" exists but has 0 articles. Fetching new data.`
+              );
+            } else {
+              console.log(
+                `useNewsData: Cache outdated for tag: ${tag}. Fetching new data.`
+              );
+            }
           }
         } else {
-          console.log(`No cache found for tag: ${tag}. Fetching new data.`);
+          console.log(
+            `useNewsData: No cache found for tag: ${tag}. Fetching new data.`
+          );
         }
 
         // 2. Fetch from API if cache is missing or outdated
@@ -93,22 +117,30 @@ export function useNewsData(tag) {
         );
 
         // 3. Update Firestore Cache
-        await setDoc(cacheDocRef, {
-          articles: filteredArticles,
-          timestamp: serverTimestamp(), // Use server timestamp
-          tag: tag,
-        });
-        console.log(`Fetched and cached news for tag: ${tag}`);
+        if (filteredArticles.length > 0) {
+          await setDoc(cacheDocRef, {
+            articles: filteredArticles,
+            timestamp: serverTimestamp(), // Use server timestamp
+            tag: tag,
+          });
+        } else {
+          console.warn(`useNewsData: No articles to cache for tag "${tag}"`);
+        }
 
         setNews(filteredArticles);
       } catch (e) {
-        console.error("Error fetching or caching news:", e);
+        console.error(
+          `useNewsData: Error fetching or caching news for tag "${tag}":`,
+          e
+        );
         // Try to use potentially outdated cache as fallback if fetch fails?
         // Or just show error. For now, show error.
         const docSnap = await getDoc(cacheDocRef);
         if (docSnap.exists() && docSnap.data().articles) {
           console.warn(
-            `API fetch failed for ${tag}, using potentially stale cache.`
+            `useNewsData: API fetch failed for ${tag}, using potentially stale cache with ${
+              docSnap.data().articles.length
+            } articles.`
           );
           setNews(docSnap.data().articles);
           setError(
@@ -116,6 +148,9 @@ export function useNewsData(tag) {
               e.message
           );
         } else {
+          console.error(
+            `useNewsData: No cache fallback available for tag "${tag}"`
+          );
           setError("Failed to fetch news: " + e.message);
           setNews([]); // Clear news on error if no cache exists
         }
