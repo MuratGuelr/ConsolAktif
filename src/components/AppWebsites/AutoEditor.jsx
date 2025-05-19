@@ -4,6 +4,17 @@ import { LuClipboardCopy } from "react-icons/lu";
 import { FiSettings } from "react-icons/fi";
 import { GrPowerReset } from "react-icons/gr";
 import { toast } from "react-toastify";
+import { AiOutlineQuestionCircle } from "react-icons/ai";
+import { IoMdClose } from "react-icons/io";
+import { FiInfo } from "react-icons/fi";
+
+// Modal açılış kapanış animasyonları için CSS sınıfları
+const modalAnimation = {
+  fadeIn: "animate-[fade-in_0.3s_ease-in-out]",
+  fadeOut: "animate-[fade-out_0.3s_ease-in-out]",
+  scaleIn: "animate-[scale-in_0.3s_ease-out]",
+  scaleOut: "animate-[scale-out_0.3s_ease-in]",
+};
 
 const editorOptions = [
   {
@@ -53,6 +64,7 @@ const editorOptions = [
 
 const DEFAULT_ADVANCED_CONFIG = {
   margin: "0.02",
+  threshold: "0.05",
 };
 
 const AutoEditor = () => {
@@ -63,19 +75,32 @@ const AutoEditor = () => {
   const textareaRef = useRef(null);
   const [isCopying, setIsCopying] = useState(false);
   const [isNewOptionSelected, setIsNewOptionSelected] = useState(false); // Yeni state: Ana seçenek mi değişti?
+  const [inBestMode, setInBestMode] = useState(false); // "En İyi" modu aktif mi?
+  const [exportFormat, setExportFormat] = useState(null); // Seçilen çıktı formatı
+
+  // Nasıl Kullanılır kılavuzu için state'ler
+  const [showHowToUse, setShowHowToUse] = useState(false);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
 
   const selectedEditorOption = useMemo(
     () => editorOptions.find((opt) => opt.id === selectedOptionId),
     [selectedOptionId]
   );
 
-  const appName = useMemo(
-    () => selectedEditorOption?.name || null,
-    [selectedEditorOption]
-  );
+  const appName = useMemo(() => {
+    if (inBestMode) {
+      return (
+        "Akıllı Kesim" +
+        (exportFormat
+          ? ` + ${editorOptions.find((o) => o.id === exportFormat)?.name || ""}`
+          : "")
+      );
+    }
+    return selectedEditorOption?.name || null;
+  }, [selectedEditorOption, inBestMode, exportFormat]);
 
-  const showAdvancedSettingsPanel =
-    selectedOptionId !== null && selectedOptionId !== "all";
+  const showAdvancedSettingsPanel = selectedOptionId !== null;
 
   // Script Üretimi: selectedOptionId veya advancedConfig değiştiğinde tetiklenir
   useEffect(() => {
@@ -100,6 +125,14 @@ const AutoEditor = () => {
     }
   }, [selectedOptionId, advancedConfig, isNewOptionSelected]); // isNewOptionSelected'ı bağımlılığa ekle
 
+  // "En İyi" modunda export format değişince script'i güncelle
+  useEffect(() => {
+    // Sadece "En İyi" modundaysa ve selectedOptionId geçerliyse çalış
+    if (inBestMode && selectedOptionId === "best") {
+      generateBatchScript("best", advancedConfig);
+    }
+  }, [exportFormat, inBestMode, advancedConfig, selectedOptionId]); // Tüm ilgili bağımlılıkları ekle
+
   // Config güncellendiğinde (yeni script geldiğinde) scroll animasyonu
   useEffect(() => {
     // Bu useEffect sadece config gerçekten script içeriğiyle güncellendiğinde ve
@@ -110,37 +143,17 @@ const AutoEditor = () => {
       // bu, yeni bir ana seçenek için scriptin geldiği anlamına gelir.
       // Yukarıdaki useEffect (selectedOptionId, advancedConfig, isNewOptionSelected'a bağlı olan)
       // zaten scroll'u anlık olarak başa almıştı. Şimdi smooth scroll ile aşağı kaydırabiliriz.
-
       // Bu kontrolü `isNewOptionSelected` yerine, `config`'in önceki halinden farklı olup olmadığıyla yapabiliriz
       // Ancak `isNewOptionSelected` bayrağı daha net bir ayrım sunar.
-      // Şimdilik, `config`'in `placeholder`dan farklı olması yeterli bir koşul gibi görünüyor.
-
-      const performSmoothScroll = () => {
-        if (textareaRef.current) {
-          textareaRef.current.style.scrollBehavior = "smooth";
-          textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
-          // Animasyon bittikten sonra auto'ya almak, kullanıcı scroll'unu etkilememesi için iyi olabilir.
-          // Ama sürekli smooth kalması da bir tercih.
-          // setTimeout(() => {
-          //   if(textareaRef.current) textareaRef.current.style.scrollBehavior = 'auto';
-          // }, 500); // Scroll süresine bağlı bir gecikme
-        }
-      };
-
-      // Eğer config değişimi bir ana seçenek değişikliğinden kaynaklanıyorsa
-      // ve scroll zaten başa alınmışsa, şimdi smooth scroll yap.
-      // Bu ayrımı daha iyi yapmak için `isNewOptionSelected`'ın etkisini düşünmek lazım.
-      // Şimdilik, config'in placeholder'dan farklı olduğu her durumda (yeni script geldiğinde)
+      // Şimdilik, `config`'in `placeholder`dan farklı olduğu her durumda (yeni script geldiğinde)
       // scroll'u en alta kaydırmaya çalışalım. Gelişmiş ayar değişikliğinde
       // scroll zaten en altta olmayacağı için bu çok fark yaratmayacaktır.
       // Asıl sorun, gelişmiş ayar değiştiğinde scroll'un başa dönmemesi.
-
       // YENİ YAKLAŞIM: Sadece yeni bir ana seçenek seçildiğinde animasyonlu scroll.
       // Bu bilgi `handleOptionButtonClick` -> `setIsNewOptionSelected(true)` -> ve ilk `useEffect`'teki `setTimeout` ile yönetiliyor.
       // Bu `useEffect` (sadece `config`'e bağlı olan) bu durumda gereksiz karmaşıklık yaratabilir.
       // Animasyonu doğrudan `generateBatchScript` sonrası veya `isNewOptionSelected` ile tetiklenen `useEffect`'in
       // `setTimeout` callback'i içinde yapmak daha doğru olabilir.
-
       // Yukarıdaki useEffect (selectedOptionId, advancedConfig, isNewOptionSelected'a bağlı olan)
       // içinde `setIsNewOptionSelected(false)` çağrısından hemen önce scroll animasyonunu yapmak daha mantıklı.
     }
@@ -156,11 +169,11 @@ const AutoEditor = () => {
 
   const generateBatchScript = (type, currentAdvancedConfig) => {
     // ... (generateBatchScript içeriği aynı)
-    let batchScript = `@echo off\nsetlocal enabledelayedexpansion\ncolor 0B\nchcp 65001 > nul\n`;
-    batchScript += `set "pwshcmd=powershell -noprofile -command "&{[System.Reflection.Assembly]::LoadWithPartialName('System.windows.forms') | Out-Null;$OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog; $OpenFileDialog.Filter = 'Video Dosyaları (*.mp4, *.mov, *.avi, *.mkv)|*.mp4;*.mov;*.avi;*.mkv|Tüm Dosyalar (*.*)|*.*'; $OpenFileDialog.Title = 'Lütfen düzenlenecek video dosyasını seçin'; $OpenFileDialog.ShowDialog()|out-null; $OpenFileDialog.FileName}"\n`;
+    let batchScript = `@echo off\nsetlocal enabledelayedexpansion\ncolor b\n`;
+    batchScript += `set pwshcmd=powershell -noprofile -command "&{[System.Reflection.Assembly]::LoadWithPartialName('System.windows.forms') | Out-Null;$OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog; $OpenFileDialog.ShowDialog()|out-null; $OpenFileDialog.FileName}"\n`;
     batchScript += `for /f "delims=" %%I in ('%pwshcmd%') do set "FileName=%%I"\n`;
-    batchScript += `set "FnS=Dosya seçilmediği için program kapatıldı."\n`;
-    batchScript += `if "%FileName%"=="" (\n    start "" cmd /c "@echo off & mode con cols=70 lines=10 & @color 0B & echo. & echo   ------------------ %FnS% ------------------ & echo. & timeout /t 5 /nobreak > nul & exit"\n    exit /b\n)\n`;
+    batchScript += `set FnS=Dosya secilmedigi icin program kapatildi.\n`;
+    batchScript += `if "%FileName%"=="" (\n    start cmd /c "@echo off & mode con cols=70 lines=10 & @color b & echo - %FnS% - & pause>nul"\n    exit\n)\n`;
 
     const marginValue = parseFloat(currentAdvancedConfig.margin);
     const marginParam =
@@ -183,7 +196,15 @@ const AutoEditor = () => {
       case "mp4":
         break;
       case "best":
-        autoEditorCommand += " --edit audio:threshold=0.05";
+        autoEditorCommand += ` --edit audio:threshold=${currentAdvancedConfig.threshold}`;
+        // Seçili export formatı varsa ekle
+        if (exportFormat === "premiere") {
+          autoEditorCommand += " --export premiere";
+        } else if (exportFormat === "resolve") {
+          autoEditorCommand += " --export resolve";
+        } else if (exportFormat === "final-cut") {
+          autoEditorCommand += " --export final-cut-pro";
+        }
         break;
       case "all":
         batchScript += `
@@ -209,7 +230,7 @@ if "%choice%"=="1" (
 )
 @cls
 echo Islem baslatiliyor, lutfen bekleyin...
-auto-editor "!FileName!" %export_param%${marginParam} --edit audio:threshold=0.05
+auto-editor "!FileName!" %export_param%${marginParam} --edit audio:threshold=${currentAdvancedConfig.threshold}
 goto end_script
 `;
         break;
@@ -238,6 +259,47 @@ goto end_script
   };
 
   const handleOptionButtonClick = (optionId) => {
+    // "En İyi" modundaysak ve export formatına tıklandıysa özel işlem yap
+    if (inBestMode) {
+      // En İyiye tekrar tıklandıysa moddan çık
+      if (optionId === "best") {
+        setInBestMode(false);
+        setExportFormat(null);
+        setIsNewOptionSelected(true); // Yeniden script oluştur
+        return;
+      }
+
+      // Sadece çıktı formatları için işlem yap (premiere, resolve, final-cut)
+      if (["premiere", "resolve", "final-cut"].includes(optionId)) {
+        if (exportFormat === optionId) {
+          // Aynı format tekrar seçildiyse kaldır
+          setExportFormat(null);
+          toast.info(
+            `${
+              editorOptions.find((o) => o.id === optionId)?.name
+            } çıktı formatı kaldırıldı.`,
+            { theme: "colored" }
+          );
+        } else {
+          // Yeni bir format seçildiyse değiştir
+          setExportFormat(optionId);
+          toast.success(
+            `${
+              editorOptions.find((o) => o.id === optionId)?.name
+            } çıktı formatı eklendi!`,
+            { theme: "colored" }
+          );
+        }
+
+        // Artık useEffect ile otomatik script güncellemesi yapılacak
+        return;
+      }
+
+      // "En İyi" modunda diğer butonları (mp4, all) yoksay
+      return;
+    }
+
+    // Normal mod işlemleri
     if (selectedOptionId === optionId && optionId !== "all") {
       setSelectedOptionId(null);
       setShowAdvancedUI(false);
@@ -248,6 +310,20 @@ goto end_script
       } else {
         setIsNewOptionSelected(false); // Aynı ana seçenek (belki gelişmiş ayar değişimi sonrası tetiklendi)
       }
+
+      // "En İyi" modunu ayarla
+      if (optionId === "best") {
+        setInBestMode(true);
+        setExportFormat(null); // Export format sıfırla
+        toast.info(
+          "Akıllı Kesim özelleştirme modu aktif! Çıktı formatını seçebilirsiniz.",
+          { theme: "colored" }
+        );
+      } else {
+        setInBestMode(false);
+        setExportFormat(null);
+      }
+
       setSelectedOptionId(optionId);
       if (optionId === "all") {
         setShowAdvancedUI(false);
@@ -296,6 +372,8 @@ goto end_script
     setAdvancedConfig(DEFAULT_ADVANCED_CONFIG);
     setShowAdvancedUI(false);
     setIsNewOptionSelected(false);
+    setInBestMode(false);
+    setExportFormat(null);
     toast.info("Ayarlar sıfırlandı.", { theme: "colored" });
   };
 
@@ -305,17 +383,56 @@ goto end_script
     if (favicon) {
       favicon.href = "/apps/auto-editor/app.png";
     }
+
+    // Nasıl Kullanılır kılavuzunu gösterip göstermemeyi kontrol et
+    const dontShowAgainSetting = localStorage.getItem(
+      "dontShowAutoEditorGuide"
+    );
+    if (dontShowAgainSetting !== "true") {
+      setShowHowToUse(true);
+    }
   }, []);
+
+  // Tekrar gösterme seçeneğini kaydet
+  const handleDontShowAgain = () => {
+    setDontShowAgain(!dontShowAgain);
+  };
+
+  // Kılavuzu kapat (animasyonlu)
+  const closeHowToUse = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setShowHowToUse(false);
+      setIsClosing(false);
+      if (dontShowAgain) {
+        localStorage.setItem("dontShowAutoEditorGuide", "true");
+      }
+    }, 300); // Animasyon süresi kadar bekle
+  };
+
+  // Kılavuzu aç
+  const openHowToUse = () => {
+    setShowHowToUse(true);
+  };
 
   return (
     <div className="py-10 px-4 bg-gradient-to-br from-base-300 to-base-100 min-h-screen">
       <div className="mockup-window border bg-base-200 border-base-300 shadow-2xl w-full max-w-3xl mx-auto">
         <div className="flex justify-center px-4 py-8 sm:py-16 bg-base-200 border-t border-base-300">
           <div className="w-full space-y-6">
-            <Header
-              title="Auto-Editor Batch Script Oluşturucu"
-              subtitle="ConsolAktif tarafından sizin için hazırlandı!"
-            />
+            <div className="flex justify-between items-center">
+              <Header
+                title="Auto-Editor Batch Script Oluşturucu"
+                subtitle="ConsolAktif tarafından sizin için hazırlandı!"
+              />
+              <button
+                onClick={openHowToUse}
+                className="btn btn-circle btn-ghost text-primary hover:bg-primary hover:text-primary-content transition-colors"
+                aria-label="Nasıl Kullanılır?"
+              >
+                <AiOutlineQuestionCircle size={24} />
+              </button>
+            </div>
 
             {showAdvancedSettingsPanel && (
               <div
@@ -360,11 +477,50 @@ goto end_script
                       Kliplerin başında ve sonunda bırakılacak ekstra süre.
                     </p>
                   </div>
+
+                  {/* Ses Eşiği (Threshold) ayarını sadece "En İyi" ve "Hepsi" seçenekleri için göster */}
+                  {(selectedOptionId === "best" ||
+                    selectedOptionId === "all") && (
+                    <div>
+                      <label
+                        htmlFor="thresholdRange"
+                        className="block text-sm font-medium text-base-content mb-1"
+                      >
+                        Ses Eşiği (Threshold):{" "}
+                        <span className="font-bold text-secondary">
+                          {advancedConfig.threshold}
+                        </span>
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs">0.01</span>
+                        <input
+                          id="thresholdRange"
+                          type="range"
+                          step="0.01"
+                          min="0.01"
+                          max="0.2"
+                          className="range range-accent range-sm flex-grow"
+                          value={advancedConfig.threshold}
+                          onChange={(e) =>
+                            handleAdvancedConfigChange(
+                              "threshold",
+                              e.target.value
+                            )
+                          }
+                        />
+                        <span className="text-xs">0.2</span>
+                      </div>
+                      <p className="text-xs text-base-content-secondary mt-1">
+                        Ses kesimi için eşik değeri. Düşük değerler daha hassas
+                        kesim yapar.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
-            {selectedOptionId && selectedOptionId !== "all" && (
+            {selectedOptionId && (
               <button
                 onClick={() => setShowAdvancedUI(!showAdvancedUI)}
                 className="btn btn-sm btn-outline btn-accent w-full mt-2 mb-4"
@@ -434,11 +590,35 @@ goto end_script
                                     ${
                                       selectedOptionId === option.id
                                         ? "btn-active !bg-primary text-primary-content ring-2 ring-primary ring-offset-2 ring-offset-base-100 scale-105"
+                                        : inBestMode
+                                        ? option.id === "mp4" && !exportFormat
+                                          ? "opacity-100 !bg-accent/20 ring-1 ring-accent" // MP4 "En İyi" modunda özel görünüm
+                                          : [
+                                              "premiere",
+                                              "resolve",
+                                              "final-cut",
+                                            ].includes(option.id)
+                                          ? exportFormat === option.id
+                                            ? "opacity-100 !bg-secondary/20 ring-1 ring-secondary" // Seçili export formatı
+                                            : "opacity-100" // Seçilebilir export formatları
+                                          : "grayscale opacity-50" // Diğer butonlar pasif
+                                        : selectedOptionId === "all" &&
+                                          option.id !== "all"
+                                        ? "opacity-100" // "Hepsi" seçildiğinde diğer butonlar renkli
                                         : "grayscale hover:grayscale-0 opacity-70 hover:opacity-100"
                                     }
                                     `}
                         onClick={() => handleOptionButtonClick(option.id)}
                         aria-label={option.name}
+                        disabled={
+                          inBestMode &&
+                          ![
+                            "best",
+                            "premiere",
+                            "resolve",
+                            "final-cut",
+                          ].includes(option.id)
+                        }
                       >
                         <img
                           src={option.icon}
@@ -467,6 +647,317 @@ goto end_script
                 Tüm Ayarları Sıfırla
               </button>
             </div>
+
+            {/* Nasıl Kullanılır Modal */}
+            {showHowToUse && (
+              <div
+                className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm ${
+                  isClosing ? modalAnimation.fadeOut : modalAnimation.fadeIn
+                }`}
+              >
+                <div
+                  className={`bg-base-100 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-auto ${
+                    isClosing ? modalAnimation.scaleOut : modalAnimation.scaleIn
+                  }`}
+                >
+                  <div className="sticky top-0 z-10 bg-primary text-primary-content px-6 py-4 flex justify-between items-center rounded-t-2xl">
+                    <h3 className="text-xl font-semibold flex items-center">
+                      <FiInfo className="mr-2" size={20} />
+                      Auto-Editor Nasıl Kullanılır?
+                    </h3>
+                    <button
+                      onClick={closeHowToUse}
+                      className="btn btn-circle btn-sm btn-ghost text-primary-content hover:bg-primary-focus"
+                    >
+                      <IoMdClose size={18} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 space-y-6">
+                    <div className="space-y-6">
+                      <div className="border-l-4 border-primary pl-4">
+                        <p className="text-sm text-base-content/80 italic">
+                          Bu araç, videolarınızdan sessiz bölümleri otomatik
+                          olarak kesmek için
+                          <strong> Auto-Editor</strong> uygulamasını
+                          kullanmanızı kolaylaştıran bir script oluşturucudur.
+                        </p>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div className="card bg-base-200 shadow-sm">
+                          <div className="card-body p-4">
+                            <h4 className="card-title text-lg text-primary">
+                              📋 Adım 1: Mod Seçimi
+                            </h4>
+                            <p>Aşağıdaki seçeneklerden birini seçin:</p>
+                            <ul className="list-disc list-inside space-y-2 ml-2">
+                              <li>
+                                <strong className="text-secondary">
+                                  Akıllı Kesim (En İyi):
+                                </strong>{" "}
+                                Ses seviyesine göre akıllı kesim yapar ve
+                                istediğiniz bir çıktı formatı seçebilirsiniz.
+                              </li>
+                              <li>
+                                <strong className="text-secondary">
+                                  Premiere Pro:
+                                </strong>{" "}
+                                Adobe Premiere Pro XML formatında çıktı almanızı
+                                sağlar.
+                              </li>
+                              <li>
+                                <strong className="text-secondary">
+                                  Davinci Resolve:
+                                </strong>{" "}
+                                Davinci Resolve EDL formatında çıktı almanızı
+                                sağlar.
+                              </li>
+                              <li>
+                                <strong className="text-secondary">
+                                  Final Cut Pro:
+                                </strong>{" "}
+                                Final Cut Pro XML formatında çıktı almanızı
+                                sağlar.
+                              </li>
+                              <li>
+                                <strong className="text-secondary">
+                                  MP4 Çıktı:
+                                </strong>{" "}
+                                Doğrudan düzenlenmiş MP4 video olarak dışa
+                                aktarmanızı sağlar.
+                              </li>
+                              <li>
+                                <strong className="text-secondary">
+                                  Hepsi:
+                                </strong>{" "}
+                                Script çalıştırıldığında formatı seçmenize
+                                olanak tanır.
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+
+                        <div className="card bg-base-200 shadow-sm">
+                          <div className="card-body p-4">
+                            <h4 className="card-title text-lg text-primary">
+                              ⚙️ Adım 2: Gelişmiş Ayarlar
+                            </h4>
+                            <p>
+                              İsterseniz gelişmiş ayarları düzenleyebilirsiniz:
+                            </p>
+                            <ul className="list-disc list-inside space-y-2 ml-2">
+                              <li>
+                                <strong className="text-secondary">
+                                  Klip Başı/Sonu Boşluk (Margin):
+                                </strong>{" "}
+                                Kesilen klipler arasında bırakılacak boşluk
+                                miktarı.
+                              </li>
+                              <li>
+                                <strong className="text-secondary">
+                                  Ses Eşiği (Threshold):
+                                </strong>{" "}
+                                Kesim için kullanılacak ses eşiği değeri. Düşük
+                                değerler daha hassas kesim yapar (sadece Akıllı
+                                Kesim ve Hepsi modlarında).
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+
+                        <div className="card bg-base-200 shadow-sm">
+                          <div className="card-body p-4">
+                            <h4 className="card-title text-lg text-primary">
+                              🚀 Adım 3: Scripti Kullanma
+                            </h4>
+                            <ol className="list-decimal list-inside space-y-2 ml-2">
+                              <li>
+                                Oluşturulan scripti kopyalamak için script
+                                penceresinin sağ üst köşesindeki{" "}
+                                <LuClipboardCopy className="inline" /> kopyalama
+                                butonuna tıklayın.
+                              </li>
+                              <li>
+                                Kopyalanan metni{" "}
+                                <code className="px-1 py-0.5 bg-base-300 rounded">
+                                  .bat
+                                </code>{" "}
+                                uzantılı bir dosyaya kaydedin (örn:{" "}
+                                <code className="px-1 py-0.5 bg-base-300 rounded">
+                                  auto_editor.bat
+                                </code>
+                                ).
+                              </li>
+                              <li>
+                                Oluşturduğunuz bat dosyasını çalıştırın ve video
+                                dosyanızı seçin.
+                              </li>
+                              <li>
+                                Auto-Editor işlemi tamamlandığında çıktı
+                                dosyalarınızı kullanabilirsiniz.
+                              </li>
+                            </ol>
+                          </div>
+                        </div>
+
+                        <div className="card bg-base-200 shadow-sm">
+                          <div className="card-body p-4">
+                            <h4 className="card-title text-lg text-primary">
+                              📝 Akıllı Kesim Modu Özel Kullanımı
+                            </h4>
+                            <p className="mb-2">
+                              Akıllı Kesim modunu seçtikten sonra:
+                            </p>
+                            <ol className="list-decimal list-inside space-y-2 ml-2">
+                              <li>
+                                İsterseniz bir çıktı formatı (Premiere Pro,
+                                Davinci Resolve, Final Cut Pro) seçebilirsiniz.
+                              </li>
+                              <li>
+                                Seçili çıktı formatına tekrar tıklayarak seçimi
+                                kaldırabilir ve sadece MP4 çıktısı
+                                alabilirsiniz.
+                              </li>
+                              <li>
+                                Formatı değiştirdiğinizde script otomatik olarak
+                                güncellenir.
+                              </li>
+                            </ol>
+                          </div>
+                        </div>
+
+                        <div className="card bg-base-200 shadow-sm border border-accent">
+                          <div className="card-body p-4">
+                            <h4 className="card-title text-accent">
+                              🛑 Önemli Not
+                            </h4>
+                            <p>
+                              Bu scripti kullanmak için bilgisayarınızda{" "}
+                              <a
+                                href="https://auto-editor.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="link link-primary"
+                              >
+                                Auto-Editor
+                              </a>{" "}
+                              programının yüklü olması gerekir.
+                            </p>
+
+                            <div className="mt-3 p-3 bg-base-300 rounded-lg">
+                              <h5 className="font-semibold text-base mb-2">
+                                Auto-Editor Yükleme
+                              </h5>
+                              <p className="text-sm mb-2">
+                                Auto-Editor yüklemek için sadece iki adım
+                                gereklidir:
+                              </p>
+                              <ol className="list-decimal list-inside space-y-1 ml-2 text-sm">
+                                <li>
+                                  <a
+                                    href="https://www.python.org/downloads/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="link link-primary"
+                                  >
+                                    Python
+                                  </a>{" "}
+                                  kurulumunu yapın (En yeni sürüm)
+                                  <div className="mt-2 mb-3">
+                                    <p className="text-sm text-warning mb-2">
+                                      <strong>Önemli:</strong> Kurulum sırasında{" "}
+                                      <span className="text-accent font-bold">
+                                        "Add Python to PATH"
+                                      </span>{" "}
+                                      seçeneğini işaretlemeyi unutmayın!
+                                    </p>
+                                    <div className="rounded-lg border border-base-300 overflow-hidden">
+                                      <img
+                                        src="https://i.imgur.com/1rBOfqk.jpeg"
+                                        alt="Python PATH ayarı"
+                                        className="w-full object-contain"
+                                      />
+                                    </div>
+                                  </div>
+                                </li>
+                                <li>
+                                  Komut isteminde (Command Prompt) şu komutu
+                                  çalıştırın:
+                                  <div className="bg-neutral text-neutral-content p-2 mt-1 mb-1 rounded overflow-auto">
+                                    <code>pip install auto-editor</code>
+                                  </div>
+                                  <div className="mt-2 mb-3">
+                                    <div className="rounded-lg border border-base-300 overflow-hidden">
+                                      <img
+                                        src="https://i.imgur.com/jw46d9M.png"
+                                        alt="pip install auto-editor komutu"
+                                        className="w-full object-contain"
+                                      />
+                                    </div>
+                                    <p className="text-xs text-base-content/70 mt-1 text-center italic">
+                                      CMD'de pip install auto-editor komutunun
+                                      kullanımı
+                                    </p>
+                                  </div>
+                                </li>
+                              </ol>
+                              <p className="text-sm mt-2">
+                                Daha fazla bilgi için{" "}
+                                <a
+                                  href="https://github.com/WyattBlue/auto-editor"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="link link-primary"
+                                >
+                                  GitHub sayfasını
+                                </a>{" "}
+                                ziyaret edebilirsiniz.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* YouTube Video Bölümü */}
+                        <section className="mb-8 p-4 rounded-lg bg-accent/10">
+                          <h2 className="text-2xl font-semibold mb-4 text-accent">
+                            İlgili Video
+                          </h2>
+                          <div className="aspect-video rounded-lg overflow-hidden shadow-lg">
+                            <iframe
+                              src="https://www.youtube.com/embed/H3K21TpQa1g"
+                              title="Auto-Editor Kullanım Videosu"
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              className="w-full h-full"
+                            ></iframe>
+                          </div>
+                        </section>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="sticky bottom-0 bg-base-100 p-4 border-t border-base-300 flex flex-col sm:flex-row justify-between items-center gap-3 rounded-b-2xl">
+                    <label className="cursor-pointer flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        className="checkbox checkbox-primary"
+                        checked={dontShowAgain}
+                        onChange={handleDontShowAgain}
+                      />
+                      <span className="text-sm">Tekrar gösterme</span>
+                    </label>
+                    <button
+                      onClick={closeHowToUse}
+                      className="btn btn-primary w-full sm:w-auto"
+                    >
+                      Anladım
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

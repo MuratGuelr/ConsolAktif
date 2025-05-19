@@ -27,7 +27,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-1 flex-col justify-center h-screen -mt-36 -mb-36">
+    <div className="flex flex-1 flex-col justify-center h-screen -mt-36 -mb-36 animate-fade-in-up">
       <div className="card bg-base-300 w-96 shadow-sm m-auto">
         <div className="card-body">
           <div className="sm:mx-auto sm:w-full sm:max-w-sm text-center">

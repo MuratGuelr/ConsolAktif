@@ -7,7 +7,7 @@ const AdminPage = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center h-screen animate-fade-in-up">
         <span className="loading loading-lg loading-spinner text-primary"></span>
       </div>
     );
@@ -18,7 +18,7 @@ const AdminPage = () => {
 
   if (!isAdmin) {
     return (
-      <div className="container mx-auto p-4 text-center">
+      <div className="container mx-auto p-4 text-center animate-fade-in-up">
         <h1 className="text-2xl font-bold text-error mb-4">
           Erişim Reddedildi
         </h1>
@@ -29,7 +29,7 @@ const AdminPage = () => {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 animate-fade-in-up">
       <h1 className="text-3xl font-bold mb-8 text-center">
         Admin Paneli - Yeni Çözüm Ekle
       </h1>

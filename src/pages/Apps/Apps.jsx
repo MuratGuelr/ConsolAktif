@@ -20,7 +20,7 @@ const Apps = () => {
   const [displayApps, setDisplayApps] = useState(featuredAppsList);
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 animate-fade-in-up">
       <h1 className="text-3xl md:text-4xl font-bold text-center mb-8 md:mb-12">
         Faydalı <span className="text-secondary">Araçlar & Linkler</span>
       </h1>
@@ -31,7 +31,7 @@ const Apps = () => {
         <div
           className="grid gap-6" // Tailwind grid ile daha standart
           style={{
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))",
           }} // minmax ayarlandı
         >
           {displayApps.map((appItem) => (

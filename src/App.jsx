@@ -16,6 +16,7 @@ import AdminPage from "./pages/AdminPage/AdminPage";
 import SolutionDetailPage from "./pages/SolutionDetailPage/SolutionDetailPage";
 import EditSolutionPage from "./pages/AdminPage/EditSolutionPage";
 import News from "./pages/News/News";
+import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 
 function App() {
   const { user, loading } = useGetUser();
@@ -31,6 +32,7 @@ function App() {
 
   return (
     <div>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="*" element={<NotFound />} />

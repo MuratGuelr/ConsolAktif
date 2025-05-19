@@ -159,7 +159,7 @@ const ForumPage = () => {
   }, [allSolutions]);
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 lg:p-8">
+    <div className="container mx-auto p-4 sm:p-6 lg:p-8 animate-fade-in-up">
       {/* Header Section */}
       <header className="py-6 mb-8 border-b border-base-300">
         <div className="flex flex-col sm:flex-row justify-between items-center">

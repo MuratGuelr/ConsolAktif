@@ -28,11 +28,11 @@ const Profile = () => {
   return (
     <>
       {loading && !user ? (
-        <div>
+        <div className="animate-fade-in-up">
           <span className="loading loading-spinner loading-xl"></span>
         </div>
       ) : (
-        <div className="hero bg-base-100 h-screen -mt-36 -mb-36">
+        <div className="hero bg-base-100 h-screen -mt-36 -mb-36 animate-fade-in-up">
           <div className="flex justify-center">
             <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4  indicator justify-center">
               <span className="indicator-item badge badge-secondary -mt-3 text-xs">

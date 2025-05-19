@@ -155,7 +155,7 @@ const SolutionDetailPage = () => {
 
   if (userLoading || isLoadingSolution) {
     return (
-      <div className="min-h-[calc(100vh-80px)] flex justify-center items-center">
+      <div className="min-h-[calc(100vh-80px)] flex justify-center items-center animate-fade-in-up">
         <span className="loading loading-lg loading-spinner text-primary"></span>
       </div>
     );
@@ -163,7 +163,7 @@ const SolutionDetailPage = () => {
 
   if (solutionError) {
     return (
-      <div className="min-h-[calc(100vh-80px)] container mx-auto p-4 flex flex-col justify-center items-center">
+      <div className="min-h-[calc(100vh-80px)] container mx-auto p-4 flex flex-col justify-center items-center animate-fade-in-up">
         <div className="alert alert-error shadow-lg max-w-md">
           <div>
             <span>{solutionError}</span>
@@ -178,7 +178,7 @@ const SolutionDetailPage = () => {
 
   if (!solution) {
     return (
-      <div className="min-h-[calc(100vh-80px)] container mx-auto p-4 flex flex-col justify-center items-center">
+      <div className="min-h-[calc(100vh-80px)] container mx-auto p-4 flex flex-col justify-center items-center animate-fade-in-up">
         <p className="text-2xl mb-4">Çözüm bulunamadı.</p>
         <Link to="/forum" className="btn btn-primary">
           <FaArrowLeft className="mr-2" /> Foruma Geri Dön
@@ -196,7 +196,7 @@ const SolutionDetailPage = () => {
     : "Tarih bilgisi yok";
 
   return (
-    <div className="bg-base-100 min-h-[calc(100vh-80px)] py-8 px-4 md:px-8 lg:px-12">
+    <div className="bg-base-100 min-h-[calc(100vh-80px)] py-8 px-4 md:px-8 lg:px-12 animate-fade-in-up">
       <div className="max-w-5xl mx-auto">
         {/* Back to Forum Link */}
         <div className="mb-6">

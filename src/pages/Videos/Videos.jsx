@@ -65,7 +65,7 @@ const Videos = () => {
   // --- Yükleme ve Hata Durumları ---
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 animate-fade-in-up">
         <h1 className="text-3xl md:text-4xl font-bold text-center mb-8 md:mb-12">
           Tüm Videolar Yükleniyor...
         </h1>
@@ -85,7 +85,7 @@ const Videos = () => {
 
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-8 text-center">
+      <div className="container mx-auto px-4 py-8 text-center animate-fade-in-up">
         <h1 className="text-3xl md:text-4xl font-bold text-error mb-4">
           Bir Hata Oluştu
         </h1>
@@ -99,7 +99,7 @@ const Videos = () => {
 
   if (!rawVideos || rawVideos.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-8 text-center">
+      <div className="container mx-auto px-4 py-8 text-center animate-fade-in-up">
         <h1 className="text-3xl md:text-4xl font-bold mb-4">Videolar</h1>
         <p className="text-gray-400">Henüz hiç video bulunmuyor.</p>
       </div>
@@ -108,7 +108,7 @@ const Videos = () => {
 
   // --- Ana İçerik ---
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 animate-fade-in-up">
       <h1 className="text-3xl md:text-4xl font-bold text-center mb-8 md:mb-12">
         Tüm <span className="text-primary">Videolarım</span> (
         {sortedVideos.length})

@@ -22,7 +22,7 @@ const FILTERS = [
 const ITEMS_PER_PAGE_OPTIONS = [9, 12, 18, 24];
 
 export default function News() {
-  const [tag, setTag] = useState("all");
+  const [tag, setTag] = useState("technology");
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(9);
   const [searchTerm, setSearchTerm] = useState("");
@@ -38,29 +38,24 @@ export default function News() {
     if (!allNews || allNews.length === 0) return [];
 
     // Apply search filter if we have a search term
-    let filtered = searchTerm.trim()
-      ? allNews.filter((item) => {
-          const searchTermLower = searchTerm.toLowerCase();
-          // Split search term into keywords for more flexible matching
-          const keywords = searchTermLower.split(/\s+/).filter(Boolean);
+    let filtered = [...allNews];
 
-          // Function to check if a text contains any of the keywords
-          const containsAnyKeyword = (text) => {
-            if (!text) return false;
-            text = text.toLowerCase();
+    // Sadece arama terimi varsa filtrele
+    if (searchTerm.trim()) {
+      const searchTermLower = searchTerm.toLowerCase().trim();
 
-            // Check if any keyword is included in the text
-            return keywords.some((keyword) => text.includes(keyword));
-          };
+      filtered = filtered.filter((item) => {
+        const name = (item.name || "").toLowerCase();
+        const description = (item.description || "").toLowerCase();
+        const source = (item.source || "").toLowerCase();
 
-          // Check if any field contains any of the keywords
-          return (
-            containsAnyKeyword(item.name) ||
-            containsAnyKeyword(item.description) ||
-            containsAnyKeyword(item.source)
-          );
-        })
-      : [...allNews];
+        return (
+          name.includes(searchTermLower) ||
+          description.includes(searchTermLower) ||
+          source.includes(searchTermLower)
+        );
+      });
+    }
 
     // Apply sorting
     if (sortBy === "newest") {
@@ -164,93 +159,15 @@ export default function News() {
   }
 
   // --- No News Found State ---
-  if (!loading && processedNews.length === 0) {
-    return (
-      <div className="container mx-auto px-4 py-12 md:py-16 animate-fade-in-up">
-        {/* Use Tabs for filters here too for consistency */}
-        <div role="tablist" className="tabs tabs-lifted justify-center mb-12">
-          {FILTERS.map((f) => (
-            <a
-              key={f.tag}
-              role="tab"
-              className={`tab ${
-                tag === f.tag ? "tab-active font-semibold" : ""
-              }`}
-              onClick={() => handleFilter(f.tag)} // Use onClick on the 'a' tag
-            >
-              {f.label}
-            </a>
-          ))}
-        </div>
-
-        {error && allNews && allNews.length === 0 && (
-          <div
-            className="alert alert-warning shadow-lg mb-6 animate-fade-in-down"
-            style={{ animationDelay: "100ms" }}
-          >
-            <div>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="stroke-current flex-shrink-0 h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                />
-              </svg>
-              <span>{error}</span>
-            </div>
-          </div>
-        )}
-
-        <div
-          className="card w-full bg-base-200 shadow-xl max-w-2xl mx-auto border border-base-content/10 mt-8 animate-zoom-in"
-          style={{ animationDelay: "200ms" }}
-        >
-          <figure className="px-10 pt-10">
-            <img src="/notfind.jpg" alt="No News" className="rounded-xl" />
-          </figure>
-          <div className="card-body items-center text-center">
-            <h2 className="card-title text-2xl mb-2">Haber Bulunamadı</h2>
-            <p className="text-base-content/80">
-              {searchTerm
-                ? `"${searchTerm}" aramanız için haber bulunamadı. Lütfen farklı bir arama terimi deneyin.`
-                : "Bu kategoride haber bulunamadı. Lütfen daha sonra tekrar kontrol ediniz."}
-            </p>
-            <div className="card-actions mt-6 flex flex-col sm:flex-row gap-3">
-              {searchTerm && (
-                <button
-                  className="btn btn-secondary btn-outline animate-fade-in-left"
-                  onClick={clearFilters}
-                  style={{ animationDelay: "300ms" }}
-                >
-                  Filtreleri Temizle
-                </button>
-              )}
-              <button
-                className="btn btn-primary btn-outline animate-fade-in-right"
-                onClick={() => handleFilter("technology")}
-                style={{ animationDelay: "400ms" }}
-              >
-                Teknoloji Haberlerine Dön
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Yükleme tamamlandı ve hiç haber bulunamadı, ama bu artık ayrı bir sayfa döndürmeyecek
+  // Ana sayfa düzenini koruyacağız ve aşağıda haber grid alanında mesaj göstereceğiz
 
   // Calculate total pages for pagination
   const totalPages = Math.ceil(processedNews.length / itemsPerPage);
 
   // --- Main Content --- (News Display)
   return (
-    <div className="container mx-auto px-4 py-12 md:py-16 bg-base-100 min-h-screen">
+    <div className="container mx-auto px-4 py-12 md:py-16 bg-base-100 min-h-screen animate-fade-in-up">
       {/* Title */}
       <h1 className="text-4xl md:text-5xl font-bold mb-10 text-center text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
         Güncel{" "}
@@ -389,99 +306,104 @@ export default function News() {
 
       {/* News Card Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {currentNewsPage.length > 0
-          ? currentNewsPage.map((item, index) => (
-              <a
-                key={item.url || index} // Use index as fallback key
-                href={item.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                // Apply animation class and staggered delay
-                className="card bg-base-300 shadow-xl hover:shadow-2xl border border-transparent hover:border-primary/50 
-                           transform transition-all duration-300 ease-in-out hover:-translate-y-1 group animate-fade-in-up"
-                style={{ animationDelay: `${index * 100}ms` }} // Staggered delay
-              >
-                {/* Figure with hover overlay effect */}
-                <figure className="relative overflow-hidden">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-full h-52 object-cover transition-transform duration-300 group-hover:scale-105"
-                    referrerPolicy="no-referrer"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = "/placeholder-image.svg";
-                      e.target.classList.add("opacity-60");
-                    }}
-                  />
-                  {/* Gradient overlay on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </figure>
-                <div className="card-body p-5">
-                  <h2 className="card-title text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
-                    {item.name}
-                  </h2>
-                  <p className="line-clamp-3 text-base-content/80 text-sm mb-4">
-                    {item.description}
-                  </p>
-                  <div className="card-actions justify-end items-center mt-auto pt-2">
-                    <span className="badge badge-primary-content badge-outline text-xs font-medium">
-                      {item.source}
-                    </span>
-                    {/* Show category badge when in "all" view */}
-                    {tag === "all" && item.category && (
-                      <span
-                        className={`badge badge-sm ${
-                          item.category === "technology"
-                            ? "badge-primary"
-                            : item.category === "economy"
-                            ? "badge-secondary"
-                            : item.category === "sport"
-                            ? "badge-accent"
-                            : "badge-info"
-                        } text-xs ml-1`}
-                      >
-                        {item.category === "technology"
-                          ? "Teknoloji"
-                          : item.category === "economy"
-                          ? "Ekonomi"
-                          : item.category === "sport"
-                          ? "Spor"
-                          : "Genel"}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </a>
-            ))
-          : !loading &&
-            processedNews.length === 0 && (
-              // Styled empty state for tags
-              <div className="col-span-full text-center py-16 bg-base-200 rounded-lg shadow">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-12 w-12 mx-auto text-base-content/30 mb-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={1.5}
-                >
-                  {" "}
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
-                  />{" "}
-                </svg>
-                <p className="text-xl text-base-content/70">
-                  Bu kategori için haber bulunamadı.
+        {currentNewsPage.length > 0 ? (
+          currentNewsPage.map((item, index) => (
+            <a
+              key={item.url || index} // Use index as fallback key
+              href={item.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              // Apply animation class and staggered delay
+              className="card bg-base-300 shadow-xl hover:shadow-2xl border border-transparent hover:border-primary/50 
+                         transform transition-all duration-300 ease-in-out hover:-translate-y-1 group animate-fade-in-up"
+              style={{ animationDelay: `${index * 100}ms` }} // Staggered delay
+            >
+              {/* Figure with hover overlay effect */}
+              <figure className="relative overflow-hidden">
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-full h-52 object-cover transition-transform duration-300 group-hover:scale-105"
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "/placeholder-image.svg";
+                    e.target.classList.add("opacity-60");
+                  }}
+                />
+                {/* Gradient overlay on hover */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </figure>
+              <div className="card-body p-5">
+                <h2 className="card-title text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
+                  {item.name}
+                </h2>
+                <p className="line-clamp-3 text-base-content/80 text-sm mb-4">
+                  {item.description}
                 </p>
+                <div className="card-actions justify-end items-center mt-auto pt-2">
+                  <span className="badge badge-primary-content badge-outline text-xs font-medium">
+                    {item.source}
+                  </span>
+                  {/* Show category badge when in "all" view */}
+                  {tag === "all" && item.category && (
+                    <span
+                      className={`badge badge-sm ${
+                        item.category === "technology"
+                          ? "badge-primary"
+                          : item.category === "economy"
+                          ? "badge-secondary"
+                          : item.category === "sport"
+                          ? "badge-accent"
+                          : "badge-info"
+                      } text-xs ml-1`}
+                    >
+                      {item.category === "technology"
+                        ? "Teknoloji"
+                        : item.category === "economy"
+                        ? "Ekonomi"
+                        : item.category === "sport"
+                        ? "Spor"
+                        : "Genel"}
+                    </span>
+                  )}
+                </div>
               </div>
+            </a>
+          ))
+        ) : !loading ? (
+          // Arama sonucu bulunamadığında gösterilecek mesaj
+          <div className="col-span-full flex flex-col items-center justify-center py-16 px-4 bg-base-200 rounded-xl shadow-lg border border-base-300 animate-fade-in-up">
+            <img
+              src="/notfind.jpg"
+              alt="Haber Bulunamadı"
+              className="w-full max-w-xs rounded-lg mb-6"
+            />
+            <h3 className="text-2xl font-bold mb-4 text-center">
+              Maalesef aradığınız haberi bulamadık
+            </h3>
+            {searchTerm && (
+              <p className="text-base-content/70 text-center mb-6">
+                "<span className="font-medium">{searchTerm}</span>" ile ilgili
+                sonuç bulunamadı.
+              </p>
             )}
+            {searchTerm && (
+              <button onClick={clearFilters} className="btn btn-primary">
+                Filtreleri Temizle
+              </button>
+            )}
+          </div>
+        ) : (
+          // Yükleme durumunda gösterilecek placeholder
+          <div className="col-span-full flex justify-center items-center py-16">
+            <span className="loading loading-spinner loading-lg text-primary"></span>
+          </div>
+        )}
       </div>
 
-      {/* Enhanced Pagination */}
-      {totalPages > 1 && (
+      {/* Enhanced Pagination - Sadece haber varsa göster */}
+      {processedNews.length > 0 && totalPages > 1 && (
         <div className="mt-12 flex flex-col items-center space-y-4">
           <div className="flex flex-wrap justify-center items-center gap-2">
             {/* Previous Page Button */}
